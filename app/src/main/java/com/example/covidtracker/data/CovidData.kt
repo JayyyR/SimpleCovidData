@@ -13,3 +13,9 @@ data class CovidData(
     val postiveTestRate: Long? = null
 
 )
+
+
+data class CovidTrackerResponse(
+
+
+)
