@@ -1,9 +1,9 @@
-package com.example.covidtracker.viewmodel
+package com.joeracosta.covidtracker.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.covidtracker.data.CovidDataApi
-import com.example.covidtracker.data.CovidDataRepo
-import com.example.covidtracker.data.db.CovidDataDao
+import com.joeracosta.covidtracker.data.CovidDataApi
+import com.joeracosta.covidtracker.data.CovidDataRepo
+import com.joeracosta.covidtracker.data.db.CovidDataDao
 import io.reactivex.disposables.CompositeDisposable
 
 class CovidViewModel(private val covidDataApi: CovidDataApi,

@@ -1,9 +1,9 @@
-package com.example.covidtracker.data.db
+package com.joeracosta.covidtracker.data.db
 
 import android.content.Context
 import androidx.room.*
-import com.example.covidtracker.data.CovidData
-import com.example.covidtracker.data.State
+import com.joeracosta.covidtracker.data.CovidData
+import com.joeracosta.covidtracker.data.State
 import java.util.*
 
 class DatabaseHelper(val appContext: Context){

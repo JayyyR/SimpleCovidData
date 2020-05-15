@@ -1,4 +1,4 @@
-package com.example.covidtracker
+package com.joeracosta.covidtracker
 
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable

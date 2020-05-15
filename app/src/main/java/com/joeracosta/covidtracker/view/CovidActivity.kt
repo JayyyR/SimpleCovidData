@@ -1,15 +1,14 @@
-package com.example.covidtracker.view
+package com.joeracosta.covidtracker.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import com.example.covidtracker.CovidApp
-import com.example.covidtracker.R
-import com.example.covidtracker.data.CovidDataApi
-import com.example.covidtracker.data.CovidDataRepo
-import com.example.covidtracker.viewmodel.CovidViewModel
+import com.joeracosta.covidtracker.CovidApp
+import com.joeracosta.covidtracker.R
+import com.joeracosta.covidtracker.data.CovidDataApi
+import com.joeracosta.covidtracker.viewmodel.CovidViewModel
 
 class CovidActivity : AppCompatActivity() {
 

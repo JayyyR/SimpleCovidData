@@ -1,7 +1,7 @@
-package com.example.covidtracker
+package com.joeracosta.covidtracker
 
 import android.app.Application
-import com.example.covidtracker.data.db.DatabaseHelper
+import com.joeracosta.covidtracker.data.db.DatabaseHelper
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory

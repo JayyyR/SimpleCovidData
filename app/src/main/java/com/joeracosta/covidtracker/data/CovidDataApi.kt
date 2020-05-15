@@ -1,4 +1,4 @@
-package com.example.covidtracker.data
+package com.joeracosta.covidtracker.data
 
 import io.reactivex.Flowable
 import retrofit2.http.GET

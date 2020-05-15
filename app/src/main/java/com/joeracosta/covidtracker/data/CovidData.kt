@@ -1,10 +1,9 @@
-package com.example.covidtracker.data
+package com.joeracosta.covidtracker.data
 
 import android.annotation.SuppressLint
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 

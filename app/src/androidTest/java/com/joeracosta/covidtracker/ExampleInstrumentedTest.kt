@@ -1,4 +1,4 @@
-package com.example.covidtracker
+package com.joeracosta.covidtracker
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.example.covidtracker.data
+package com.joeracosta.covidtracker.data
 
 import com.google.gson.annotations.SerializedName
 
