@@ -17,7 +17,9 @@ data class CovidData(
 
     val date: Date? = null,
 
-    val postiveTestRate: Double? = null
+    val postiveTestRate: Double? = null,
+
+    val threeDayPostiveTestRateAvg: Double? = null
 )
 
 

@@ -22,7 +22,11 @@ class CovidDataRepo(
                 val covidData = it.map { rawData ->
                     rawData.toCovidData()
                 }
-                updateDatabaseData(covidData)
+
+
+                val dataWithThreeDayAverages = calculateThreeDayAverages(covidData)
+
+                updateDatabaseData(dataWithThreeDayAverages)
 
             }, {
                 println()
@@ -30,7 +34,53 @@ class CovidDataRepo(
             }).addToComposite(compositeDisposable)
     }
 
-    fun updateDatabaseData(data: List<CovidData>) {
+    private fun calculateThreeDayAverages(covidData: List<CovidData>): List<CovidData> {
+
+        val mapOfStateData = hashMapOf<State, ArrayList<CovidData>>(
+
+        )
+
+        covidData.forEach {
+
+            val state = it.state ?: return@forEach
+
+            //add empty list of needed
+            if (!mapOfStateData.containsKey(state)) {
+                mapOfStateData[state] = arrayListOf()
+            }
+
+            mapOfStateData[state]?.add(it)
+        }
+
+        val listOfStateDataWithAverages = mapOfStateData.values.map { list ->
+            //sort by date
+            list.sortBy {
+                it.date
+            }
+
+            //todo check sorted by date
+            //calculate averages
+            val listDataWithThreeDayAvgs = list.mapIndexed { index, covidData ->
+                val currentPostiveRate = covidData.postiveTestRate ?: 0.0
+                val positiveRateOneDayAgo = list.getOrNull(index - 1)?.postiveTestRate ?: currentPostiveRate
+                val positiveRateTwoDaysAgo = list.getOrNull(index - 2)?.postiveTestRate ?: positiveRateOneDayAgo
+
+                val threeDayAvg = (positiveRateOneDayAgo + positiveRateTwoDaysAgo + currentPostiveRate) / 3.0
+
+                covidData.copy(
+                    threeDayPostiveTestRateAvg = threeDayAvg
+                )
+
+            }
+
+            listDataWithThreeDayAvgs
+        }
+
+        return listOfStateDataWithAverages.flatten()
+
+    }
+
+    private fun updateDatabaseData(data: List<CovidData>) {
         Single.fromCallable {
             covidDataDao.clearAllData()
         }
@@ -43,10 +93,12 @@ class CovidDataRepo(
                     .subscribe({
                         println()
                     }, {
+                        println()
                         //todo error
                     })
 
             }, {
+                println()
                 //todo error
             }).addToComposite(compositeDisposable)
     }
