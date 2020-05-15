@@ -9,8 +9,8 @@ enum class State(val postalCode: String) {
     @SerializedName("AK")
     ALASKA("AK"),
 
-    @SerializedName("AZ")
-    ARIZONA("AZ"),
+    @SerializedName("AR")
+    ARIZONA("AR"),
 
     @SerializedName("AS")
     ARKANSAS("AS"),
