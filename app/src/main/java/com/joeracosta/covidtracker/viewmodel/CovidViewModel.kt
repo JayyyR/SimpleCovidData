@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.databinding.Bindable
 import com.joeracosta.covidtracker.BaseObservableViewModel
 import com.joeracosta.covidtracker.R
+import com.joeracosta.covidtracker.addToComposite
 import com.joeracosta.covidtracker.data.*
 import com.joeracosta.covidtracker.data.db.CovidDataDao
 import io.reactivex.disposables.CompositeDisposable
@@ -76,11 +77,32 @@ class CovidViewModel(
 
                 if (success) {
                     lastUpdatedData.setLastUpdatedTime(System.currentTimeMillis())
+
+                    //update state based on current selections
+                    val selectedUsaState = currentState.selectedUsaState ?: State.NEW_YORK //todo no default
+                    val selectedAfterDate = currentState.showDataFromDate ?: Date().apply { time = System.currentTimeMillis() - (90 * DAY) } //todo no default
+                    if (selectedUsaState != null) {
+                        updateChartData(selectedUsaState, selectedAfterDate)
+                    }
+
                 }
 
                 updateDisposable?.dispose()
             }
+    }
 
+    private fun updateChartData(state: State, afterDate: Date) {
+        covidDataDao.getPostiveRateByStateAfterDate(state.postalCode, afterDate)
+            .subscribe({
+                updateState(
+                    currentState.copy(
+                        chartedData = it
+                    )
+                )
+            }, {
+                //todo error
+            })
+            .addToComposite(compositeDisposable)
     }
 
     private fun updateState(newCovidState: CovidState) {

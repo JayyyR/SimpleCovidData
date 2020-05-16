@@ -1,7 +1,10 @@
 package com.joeracosta.covidtracker.data
 
+import java.util.*
+
 data class CovidState(
-    val currentState: State? = null,
-    val listOfData: List<CovidData>? = null,
+    val selectedUsaState: State? = null,
+    val showDataFromDate: Date? = null,
+    val chartedData: List<CovidData>? = null,
     val updatingData: Boolean? = null
 )
