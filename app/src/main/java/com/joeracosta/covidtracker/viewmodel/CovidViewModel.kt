@@ -32,8 +32,12 @@ class CovidViewModel(
     )
 
     init {
-        //todo check if I need to refresh data based on time
-        refreshData()
+
+        val updatedMoreThanADayAgo = lastUpdatedData.getLastUpdatedTime() + DAY < System.currentTimeMillis()
+
+        if (updatedMoreThanADayAgo) {
+            refreshData()
+        }
     }
 
     @Bindable
@@ -90,6 +94,10 @@ class CovidViewModel(
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.dispose()
+    }
+
+    companion object {
+        const val DAY = 24 * 60 * 60 * 1000.toLong()
     }
 
 }
