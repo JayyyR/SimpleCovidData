@@ -21,7 +21,9 @@ class CovidActivity : AppCompatActivity() {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return CovidViewModel(
                     covidDataApi = getCovidApp().retrofit.create(CovidDataApi::class.java),
-                    covidDataDao = getCovidApp().databaseHelper.covidDb.covidDataDao()
+                    covidDataDao = getCovidApp().databaseHelper.covidDb.covidDataDao(),
+                    lastUpdatedData = getCovidApp().lastUpdatedData,
+                    stringGetter = getCovidApp().stringGetter
             ) as T
         }
 
