@@ -22,7 +22,8 @@ class CovidViewModel(
 
     private val compositeDisposable = CompositeDisposable()
     private var updateDisposable: Disposable? = null
-    private val stateSubject = BehaviorSubject.createDefault(CovidState())
+    val stateSubject = BehaviorSubject.createDefault(CovidState())
+
 
     private val currentState: CovidState get() = stateSubject.value ?: CovidState()
 
@@ -33,7 +34,7 @@ class CovidViewModel(
     )
 
     init {
-
+        listenForChartData()
         val updatedMoreThanADayAgo = lastUpdatedData.getLastUpdatedTime() + DAY < System.currentTimeMillis()
 
         if (updatedMoreThanADayAgo) {
@@ -77,22 +78,17 @@ class CovidViewModel(
 
                 if (success) {
                     lastUpdatedData.setLastUpdatedTime(System.currentTimeMillis())
-
-                    //update state based on current selections
-                    val selectedUsaState = currentState.selectedUsaState ?: State.NEW_YORK //todo no default
-                    val selectedAfterDate = currentState.showDataFromDate ?: Date().apply { time = System.currentTimeMillis() - (90 * DAY) } //todo no default
-                    if (selectedUsaState != null) {
-                        updateChartData(selectedUsaState, selectedAfterDate)
-                    }
-
                 }
 
                 updateDisposable?.dispose()
             }
     }
 
-    private fun updateChartData(state: State, afterDate: Date) {
-        covidDataDao.getPostiveRateByStateAfterDate(state.postalCode, afterDate)
+    private fun listenForChartData() {
+        val selectedUsaState = currentState.selectedUsaState ?: State.NEW_YORK //todo no default
+        val selectedAfterDate = currentState.showDataFromDate ?: Date().apply { time = System.currentTimeMillis() - (90 * DAY) } //todo no default
+
+        covidDataDao.getPostiveRateByStateAfterDate(selectedUsaState.postalCode, selectedAfterDate)
             .subscribe({
                 updateState(
                     currentState.copy(
