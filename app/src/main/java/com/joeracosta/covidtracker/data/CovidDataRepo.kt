@@ -2,10 +2,13 @@ package com.joeracosta.covidtracker.data
 
 import com.joeracosta.covidtracker.addToComposite
 import com.joeracosta.covidtracker.data.db.CovidDataDao
+import io.reactivex.Maybe
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 
 class CovidDataRepo(
     private val covidDataApi: CovidDataApi,
@@ -14,7 +17,12 @@ class CovidDataRepo(
 ) {
 
 
-    fun fetchLatestCovidData() {
+    /**
+     * Fetches data from server, returns a stream that indicates whether we succeeded gathering and
+     * storing latest data
+     */
+    fun fetchLatestCovidData(): Observable<Boolean> {
+        val successObservable = BehaviorSubject.create<Boolean>()
         covidDataApi.getStateData()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -23,22 +31,26 @@ class CovidDataRepo(
                     rawData.toCovidData()
                 }
 
-
+                //todo check if data needs to be updated (new day)
                 val dataWithThreeDayAverages = calculateThreeDayAverages(covidData)
 
-                updateDatabaseData(dataWithThreeDayAverages)
+                updateDatabaseData(dataWithThreeDayAverages).subscribe({ success ->
+                    successObservable.onNext(success)
+                }, {
+                    successObservable.onNext(false)
+                })
 
             }, {
-                println()
+                successObservable.onNext(false)
                 //todo error
             }).addToComposite(compositeDisposable)
+
+        return successObservable
     }
 
     private fun calculateThreeDayAverages(covidData: List<CovidData>): List<CovidData> {
 
-        val mapOfStateData = hashMapOf<State, ArrayList<CovidData>>(
-
-        )
+        val mapOfStateData = hashMapOf<State, ArrayList<CovidData>>()
 
         covidData.forEach {
 
@@ -62,10 +74,13 @@ class CovidDataRepo(
             //calculate averages
             val listDataWithThreeDayAvgs = list.mapIndexed { index, covidData ->
                 val currentPostiveRate = covidData.postiveTestRate ?: 0.0
-                val positiveRateOneDayAgo = list.getOrNull(index - 1)?.postiveTestRate ?: currentPostiveRate
-                val positiveRateTwoDaysAgo = list.getOrNull(index - 2)?.postiveTestRate ?: positiveRateOneDayAgo
+                val positiveRateOneDayAgo =
+                    list.getOrNull(index - 1)?.postiveTestRate ?: currentPostiveRate
+                val positiveRateTwoDaysAgo =
+                    list.getOrNull(index - 2)?.postiveTestRate ?: positiveRateOneDayAgo
 
-                val threeDayAvg = (positiveRateOneDayAgo + positiveRateTwoDaysAgo + currentPostiveRate) / 3.0
+                val threeDayAvg =
+                    (positiveRateOneDayAgo + positiveRateTwoDaysAgo + currentPostiveRate) / 3.0
 
                 covidData.copy(
                     threeDayPostiveTestRateAvg = threeDayAvg
@@ -80,7 +95,9 @@ class CovidDataRepo(
 
     }
 
-    private fun updateDatabaseData(data: List<CovidData>) {
+    private fun updateDatabaseData(data: List<CovidData>): Observable<Boolean> {
+        val successObservable = BehaviorSubject.create<Boolean>()
+
         Single.fromCallable {
             covidDataDao.clearAllData()
         }
@@ -91,16 +108,18 @@ class CovidDataRepo(
                 }
                     .subscribeOn(Schedulers.io())
                     .subscribe({
-                        println()
+                        successObservable.onNext(true)
                     }, {
-                        println()
+                        successObservable.onNext(false)
                         //todo error
                     })
 
             }, {
-                println()
+                successObservable.onNext(false)
                 //todo error
             }).addToComposite(compositeDisposable)
+
+        return successObservable
     }
 
 }

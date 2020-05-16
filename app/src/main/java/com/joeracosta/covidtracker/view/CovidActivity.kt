@@ -2,12 +2,14 @@ package com.joeracosta.covidtracker.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.joeracosta.covidtracker.CovidApp
 import com.joeracosta.covidtracker.R
 import com.joeracosta.covidtracker.data.CovidDataApi
+import com.joeracosta.covidtracker.databinding.ActivityMainBinding
 import com.joeracosta.covidtracker.viewmodel.CovidViewModel
 
 class CovidActivity : AppCompatActivity() {
@@ -27,9 +29,11 @@ class CovidActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CovidViewModel::class.java)
+        binding.viewModel = viewModel
+
     }
 
     private fun getCovidApp(): CovidApp {
