@@ -42,6 +42,18 @@ class CovidViewModel(
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
+    fun getXAxisFormatter(): (Float) -> String {
+        val labelCalender = Calendar.getInstance()
+        val format = SimpleDateFormat("MM/dd")
+
+        return { value ->
+            labelCalender.timeInMillis = value.toLong()
+            val date =  format.format(labelCalender.time)
+            date
+        }
+    }
+
     @Bindable
     fun getUpdatingData(): Boolean {
         return currentState.updatingData == true

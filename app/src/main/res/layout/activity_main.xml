@@ -55,14 +55,54 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/refresh_button" />
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/corona_graph"
-            app:layout_constraintTop_toBottomOf="@id/refresh_button"
-            app:layout_constraintBottom_toBottomOf="parent"
+
+        <TextView
+            android:id="@+id/chart_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constrainedWidth="true"
+            android:layout_margin="16dp"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/refresh_button"
+            app:layout_constraintBottom_toTopOf="@+id/corona_graph"
+            android:text="@string/chart_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/corona_graph"
+            app:layout_constraintTop_toBottomOf="@id/chart_title"
+            app:layout_constraintBottom_toTopOf="@+id/state_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:xAxisFormatter="@{viewModel.xAxisFormatter}"
             android:layout_width="0dp"
             android:layout_height="0dp" />
+
+
+        <TextView
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/state_spinner"
+            android:padding="32dp"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:id="@+id/state_label"
+            android:layout_width="wrap_content"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/choose_state"/>
+
+        <Spinner
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/state_label"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="32dp"
+            app:layout_constraintTop_toBottomOf="@id/corona_graph"
+            android:id="@+id/state_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

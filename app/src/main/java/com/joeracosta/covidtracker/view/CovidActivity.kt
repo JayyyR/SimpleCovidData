@@ -1,18 +1,18 @@
 package com.joeracosta.covidtracker.view
 
-import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.AttributeSet
-import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.joeracosta.covidtracker.CovidApp
 import com.joeracosta.covidtracker.R
@@ -22,6 +22,9 @@ import com.joeracosta.covidtracker.data.CovidDataApi
 import com.joeracosta.covidtracker.databinding.ActivityMainBinding
 import com.joeracosta.covidtracker.viewmodel.CovidViewModel
 import io.reactivex.disposables.CompositeDisposable
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 class CovidActivity : AppCompatActivity() {
 
@@ -46,6 +49,9 @@ class CovidActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding?.coronaGraph?.setTouchEnabled(false)
+        binding?.coronaGraph?.xAxis?.position = XAxis.XAxisPosition.BOTTOM
+        binding?.coronaGraph?.description = null
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CovidViewModel::class.java)
         binding?.viewModel = viewModel
@@ -75,6 +81,15 @@ class CovidActivity : AppCompatActivity() {
 
             val dataPlot = LineDataSet(entries, "Three Day Average")
             dataPlot.axisDependency = YAxis.AxisDependency.LEFT
+
+            dataPlot.lineWidth = 3f
+            dataPlot.setDrawValues(false)
+
+
+
+
+
+
 
             binding?.coronaGraph?.data = LineData(arrayListOf(dataPlot) as List<ILineDataSet>?)
             binding?.coronaGraph?.invalidate()
