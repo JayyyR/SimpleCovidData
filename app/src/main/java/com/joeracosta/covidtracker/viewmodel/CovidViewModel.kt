@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.databinding.Bindable
 import com.joeracosta.covidtracker.BaseObservableViewModel
 import com.joeracosta.covidtracker.R
-import com.joeracosta.covidtracker.addToComposite
 import com.joeracosta.covidtracker.data.*
 import com.joeracosta.covidtracker.data.db.CovidDataDao
 import io.reactivex.disposables.CompositeDisposable
@@ -22,10 +21,22 @@ class CovidViewModel(
 
     private val compositeDisposable = CompositeDisposable()
     private var updateDisposable: Disposable? = null
-    val stateSubject = BehaviorSubject.createDefault(CovidState())
+    val stateSubject = BehaviorSubject.createDefault(CovidState(
+        selectedUsaState = lastUpdatedData.getSelectedUSState(),
+        showDataFromDate = Date().apply {
+            time = System.currentTimeMillis() - (90 * DAY)
+        } //todo no default
+    )
+    )
 
-
-    private val currentState: CovidState get() = stateSubject.value ?: CovidState()
+    private var daoDisposable: Disposable? = null
+    private val currentState: CovidState
+        get() = stateSubject.value ?: CovidState(
+            selectedUsaState = lastUpdatedData.getSelectedUSState(),
+            showDataFromDate = Date().apply {
+                time = System.currentTimeMillis() - (90 * DAY)
+            } //todo no default
+        )
 
     private val covidDataRepo = CovidDataRepo(
         covidDataApi = covidDataApi,
@@ -34,8 +45,9 @@ class CovidViewModel(
     )
 
     init {
-        listenForChartData()
-        val updatedMoreThanADayAgo = lastUpdatedData.getLastUpdatedTime() + DAY < System.currentTimeMillis()
+        checkDBForChartData()
+        val updatedMoreThanADayAgo =
+            lastUpdatedData.getLastUpdatedTime() + DAY < System.currentTimeMillis()
 
         if (updatedMoreThanADayAgo) {
             refreshData()
@@ -49,7 +61,7 @@ class CovidViewModel(
 
         return { value ->
             labelCalender.timeInMillis = value.toLong()
-            val date =  format.format(labelCalender.time)
+            val date = format.format(labelCalender.time)
             date
         }
     }
@@ -72,7 +84,7 @@ class CovidViewModel(
         }
 
         val format = SimpleDateFormat("MM/dd hh:mm aa")
-        val formatted =  format.format(timeLastUpdated.time)
+        val formatted = format.format(timeLastUpdated.time)
 
         return if (lastUpdatedTime == 0L) stringGetter.getString(R.string.never_updated) else "Last Updated $formatted"
     }
@@ -96,34 +108,60 @@ class CovidViewModel(
             }
     }
 
-    private fun listenForChartData() {
-        val selectedUsaState = currentState.selectedUsaState ?: State.NEW_YORK //todo no default
-        val selectedAfterDate = currentState.showDataFromDate ?: Date().apply { time = System.currentTimeMillis() - (90 * DAY) } //todo no default
+    private fun checkDBForChartData() {
+        val selectedUsaState = currentState.selectedUsaState
+        val selectedAfterDate = currentState.showDataFromDate
 
-        covidDataDao.getPostiveRateByStateAfterDate(selectedUsaState.postalCode, selectedAfterDate)
-            .subscribe({
-                updateState(
-                    currentState.copy(
-                        chartedData = it
+        //only open a new connection if the params have changed
+        if (selectedUsaState != null && selectedAfterDate != null) {
+            daoDisposable?.dispose()
+            daoDisposable = covidDataDao.getPostiveRateByStateAfterDate(
+                selectedUsaState.postalCode,
+                selectedAfterDate
+            )
+                .subscribe({
+                    currentState.selectedUsaState?.let(lastUpdatedData::setSelectedUSState)
+                    updateState(
+                        currentState.copy(
+                            chartedData = it
+                        )
                     )
-                )
-            }, {
-                //todo error
-            })
-            .addToComposite(compositeDisposable)
+                }, {
+                    //todo error
+                })
+        }
+    }
+
+    fun setSelectedUSState(selectedUSAState: State) {
+        if (selectedUSAState == currentState.selectedUsaState) return
+
+        updateState(
+            currentState.copy(
+                selectedUsaState = selectedUSAState
+            )
+        )
     }
 
     private fun updateState(newCovidState: CovidState) {
+
+        val stateSelectedBefore = currentState.selectedUsaState
+        val dateAfterSelectedBefore = currentState.showDataFromDate
         stateSubject.onNext(
             newCovidState
         )
 
         notifyChange()
+
+        //only check if data is new
+        if (stateSelectedBefore != currentState.selectedUsaState || dateAfterSelectedBefore != currentState.showDataFromDate) {
+            checkDBForChartData()
+        }
     }
 
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.dispose()
+        daoDisposable?.dispose()
     }
 
     companion object {

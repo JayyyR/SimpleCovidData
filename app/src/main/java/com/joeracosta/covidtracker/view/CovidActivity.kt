@@ -1,29 +1,31 @@
 package com.joeracosta.covidtracker.view
 
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.joeracosta.covidtracker.CovidApp
 import com.joeracosta.covidtracker.R
 import com.joeracosta.covidtracker.addToComposite
 import com.joeracosta.covidtracker.data.CovidData
 import com.joeracosta.covidtracker.data.CovidDataApi
+import com.joeracosta.covidtracker.data.State
 import com.joeracosta.covidtracker.databinding.ActivityMainBinding
 import com.joeracosta.covidtracker.viewmodel.CovidViewModel
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import java.text.SimpleDateFormat
-import java.util.*
+import io.reactivex.schedulers.Schedulers
 
 
 class CovidActivity : AppCompatActivity() {
@@ -53,14 +55,47 @@ class CovidActivity : AppCompatActivity() {
         binding?.coronaGraph?.xAxis?.position = XAxis.XAxisPosition.BOTTOM
         binding?.coronaGraph?.description = null
 
+        configureSpinner()
+
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CovidViewModel::class.java)
         binding?.viewModel = viewModel
 
-        viewModel?.stateSubject?.subscribe {
+        viewModel?.stateSubject
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe {
+
+            val currentSelectedUSState = binding?.stateSpinner?.selectedItem
+
+            if (currentSelectedUSState != it.selectedUsaState) {
+                val position = State.values().indexOf(it.selectedUsaState)
+                binding?.stateSpinner?.setSelection(position)
+            }
             plotData(it.chartedData)
         }?.addToComposite(compositeDisposable)
 
 
+    }
+
+    private fun configureSpinner() {
+
+        binding?.stateSpinner?.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, State.values())
+
+        binding?.stateSpinner?.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                State.values().getOrNull(position)?.let{
+                    viewModel?.setSelectedUSState(it)
+                }
+            }
+
+        }
     }
 
     private fun plotData(covidDatum: List<CovidData>?) {
@@ -84,11 +119,6 @@ class CovidActivity : AppCompatActivity() {
 
             dataPlot.lineWidth = 3f
             dataPlot.setDrawValues(false)
-
-
-
-
-
 
 
             binding?.coronaGraph?.data = LineData(arrayListOf(dataPlot) as List<ILineDataSet>?)

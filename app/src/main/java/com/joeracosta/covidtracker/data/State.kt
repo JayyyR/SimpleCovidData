@@ -154,8 +154,9 @@ enum class State(val postalCode: String) {
     WISCONSIN("WI"),
 
     @SerializedName("WY")
-    WYOMING("WY")
+    WYOMING("WY");
 
-
-
+    override fun toString(): String {
+        return super.toString().replace("_", " ")
+    }
 }
