@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -185,6 +186,9 @@ class CovidActivity : AppCompatActivity() {
             dataPlot.axisDependency = YAxis.AxisDependency.LEFT
 
             dataPlot.lineWidth = 3f
+            dataPlot.setCircleColor(ContextCompat.getColor(this, R.color.darkColorAccent))
+            dataPlot.circleHoleColor = ContextCompat.getColor(this, R.color.darkColorAccent)
+            dataPlot.color = ContextCompat.getColor(this, R.color.colorAccent)
             dataPlot.setDrawValues(false)
 
 
