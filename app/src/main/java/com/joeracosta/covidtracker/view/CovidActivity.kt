@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModel
@@ -17,6 +19,7 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.joeracosta.covidtracker.CovidApp
 import com.joeracosta.covidtracker.R
+import com.joeracosta.covidtracker.TimeUtil
 import com.joeracosta.covidtracker.addToComposite
 import com.joeracosta.covidtracker.data.CovidData
 import com.joeracosta.covidtracker.data.CovidDataApi
@@ -56,6 +59,7 @@ class CovidActivity : AppCompatActivity() {
         binding?.coronaGraph?.description = null
 
         configureSpinner()
+        configureDateSelector()
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CovidViewModel::class.java)
         binding?.viewModel = viewModel
@@ -74,6 +78,36 @@ class CovidActivity : AppCompatActivity() {
             plotData(it.chartedData)
         }?.addToComposite(compositeDisposable)
 
+
+    }
+
+    private fun configureDateSelector() {
+
+        binding?.timeFrame?.setOnCheckedChangeListener(object: RadioGroup.OnCheckedChangeListener {
+            override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+                val radioButton = binding?.timeFrame?.findViewById<RadioButton>(checkedId)
+                val index = binding?.timeFrame?.indexOfChild(radioButton)
+
+                when (index) {
+                    0 -> {
+                        viewModel?.setSelectedTimeFrame(TimeUtil.THREE_MONTHS_DAYS)
+                    }
+                    1 -> {
+                        viewModel?.setSelectedTimeFrame(TimeUtil.TWO_MONTHS_DAYS)
+                    }
+                    2 -> {
+                        viewModel?.setSelectedTimeFrame(TimeUtil.ONE_MONTH_DAYS)
+                    }
+                    3 -> {
+                        viewModel?.setSelectedTimeFrame(TimeUtil.TWO_WEEKS_DAYS)
+                    }
+                    4 -> {
+                        viewModel?.setSelectedTimeFrame(TimeUtil.FIVE_DAYS)
+                    }
+                }
+            }
+
+        })
 
     }
 

@@ -23,3 +23,12 @@ fun LineChart.setXAxisLabelFormatter(xAxisFormatter: (Float) -> String) {
     val xAxis = this.xAxis
     xAxis?.valueFormatter = formatter
 }
+
+object TimeUtil {
+    const val ALL_TIME_DAYS = 365
+    const val THREE_MONTHS_DAYS = 90
+    const val TWO_MONTHS_DAYS = 60
+    const val ONE_MONTH_DAYS = 30
+    const val TWO_WEEKS_DAYS = 14
+    const val FIVE_DAYS = 5
+}

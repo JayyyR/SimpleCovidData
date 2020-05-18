@@ -19,24 +19,20 @@ class CovidViewModel(
     private val stringGetter: StringGetter
 ) : BaseObservableViewModel() {
 
-    private val compositeDisposable = CompositeDisposable()
-    private var updateDisposable: Disposable? = null
-    val stateSubject = BehaviorSubject.createDefault(CovidState(
+    private val defaultState = CovidState(
         selectedUsaState = lastUpdatedData.getSelectedUSState(),
         showDataFromDate = Date().apply {
             time = System.currentTimeMillis() - (90 * DAY)
         } //todo no default
     )
-    )
+
+    private val compositeDisposable = CompositeDisposable()
+    private var updateDisposable: Disposable? = null
+    val stateSubject = BehaviorSubject.createDefault(defaultState)
 
     private var daoDisposable: Disposable? = null
     private val currentState: CovidState
-        get() = stateSubject.value ?: CovidState(
-            selectedUsaState = lastUpdatedData.getSelectedUSState(),
-            showDataFromDate = Date().apply {
-                time = System.currentTimeMillis() - (90 * DAY)
-            } //todo no default
-        )
+        get() = stateSubject.value ?: defaultState
 
     private val covidDataRepo = CovidDataRepo(
         covidDataApi = covidDataApi,
@@ -140,6 +136,19 @@ class CovidViewModel(
                 selectedUsaState = selectedUSAState
             )
         )
+    }
+
+    fun setSelectedTimeFrame(amountOfDaysAgoToShow: Int) {
+        val showDataFromDate = System.currentTimeMillis() - (amountOfDaysAgoToShow * DAY)
+
+        updateState(
+            currentState.copy(
+                showDataFromDate = Date().apply {
+                    time = showDataFromDate
+                }
+            )
+        )
+
     }
 
     private fun updateState(newCovidState: CovidState) {
