@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import androidx.databinding.Bindable
 import com.joeracosta.covidtracker.BaseObservableViewModel
 import com.joeracosta.covidtracker.R
+import com.joeracosta.covidtracker.TimeUtil.DAY_MILLIS
+import com.joeracosta.covidtracker.TimeUtil.TWO_MONTHS_DAYS
 import com.joeracosta.covidtracker.data.*
 import com.joeracosta.covidtracker.data.db.CovidDataDao
 import io.reactivex.disposables.CompositeDisposable
@@ -20,10 +22,8 @@ class CovidViewModel(
 ) : BaseObservableViewModel() {
 
     private val defaultState = CovidState(
-        selectedUsaState = lastUpdatedData.getSelectedUSState(),
-        showDataFromDate = Date().apply {
-            time = System.currentTimeMillis() - (90 * DAY)
-        } //todo no default
+        selectedUsaState = lastUpdatedData.getSelectedUSState() ?: State.NEW_YORK,
+        amountOfDaysAgoToShow = lastUpdatedData.getAmountOfDaysAgoToShow() ?: TWO_MONTHS_DAYS
     )
 
     private val compositeDisposable = CompositeDisposable()
@@ -43,7 +43,7 @@ class CovidViewModel(
     init {
         checkDBForChartData()
         val updatedMoreThanADayAgo =
-            lastUpdatedData.getLastUpdatedTime() + DAY < System.currentTimeMillis()
+            lastUpdatedData.getLastUpdatedTime() + DAY_MILLIS < System.currentTimeMillis()
 
         if (updatedMoreThanADayAgo) {
             refreshData()
@@ -106,7 +106,9 @@ class CovidViewModel(
 
     private fun checkDBForChartData() {
         val selectedUsaState = currentState.selectedUsaState
-        val selectedAfterDate = currentState.showDataFromDate
+        val amountOfDaysAgoToShow = currentState.amountOfDaysAgoToShow
+
+        val selectedAfterDate = getDateToShowFrom(amountOfDaysAgoToShow)
 
         //only open a new connection if the params have changed
         if (selectedUsaState != null && selectedAfterDate != null) {
@@ -139,13 +141,10 @@ class CovidViewModel(
     }
 
     fun setSelectedTimeFrame(amountOfDaysAgoToShow: Int) {
-        val showDataFromDate = System.currentTimeMillis() - (amountOfDaysAgoToShow * DAY)
-
+        lastUpdatedData.setAmountOfDaysAgoToShow(amountOfDaysAgoToShow)
         updateState(
             currentState.copy(
-                showDataFromDate = Date().apply {
-                    time = showDataFromDate
-                }
+                amountOfDaysAgoToShow = amountOfDaysAgoToShow
             )
         )
 
@@ -154,7 +153,7 @@ class CovidViewModel(
     private fun updateState(newCovidState: CovidState) {
 
         val stateSelectedBefore = currentState.selectedUsaState
-        val dateAfterSelectedBefore = currentState.showDataFromDate
+        val amountOfDaysAgoToShow = currentState.amountOfDaysAgoToShow
         stateSubject.onNext(
             newCovidState
         )
@@ -162,19 +161,25 @@ class CovidViewModel(
         notifyChange()
 
         //only check if data is new
-        if (stateSelectedBefore != currentState.selectedUsaState || dateAfterSelectedBefore != currentState.showDataFromDate) {
+        if (stateSelectedBefore != currentState.selectedUsaState || amountOfDaysAgoToShow != currentState.amountOfDaysAgoToShow) {
             checkDBForChartData()
         }
     }
+
+
+    private fun getDateToShowFrom(amountOfDaysAgoToShow: Int?): Date? {
+        if (amountOfDaysAgoToShow == null ) return null
+
+        return Date().apply {
+            time = System.currentTimeMillis() - (amountOfDaysAgoToShow * DAY_MILLIS)
+        }
+    }
+
 
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.dispose()
         daoDisposable?.dispose()
-    }
-
-    companion object {
-        const val DAY = 24 * 60 * 60 * 1000.toLong()
     }
 
 }

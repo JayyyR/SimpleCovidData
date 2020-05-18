@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Covid Tracker</string>
+    <string name="app_name">Covid Data Tracker</string>
     <string name="updating">Updating&#8230;</string>
     <string name="refresh_data">REFRESH DATA</string>
     <string name="never_updated">Never Updated</string>

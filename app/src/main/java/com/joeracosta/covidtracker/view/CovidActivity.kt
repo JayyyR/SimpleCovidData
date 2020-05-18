@@ -42,10 +42,10 @@ class CovidActivity : AppCompatActivity() {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return CovidViewModel(
-                    covidDataApi = getCovidApp().retrofit.create(CovidDataApi::class.java),
-                    covidDataDao = getCovidApp().databaseHelper.covidDb.covidDataDao(),
-                    lastUpdatedData = getCovidApp().lastUpdatedData,
-                    stringGetter = getCovidApp().stringGetter
+                covidDataApi = getCovidApp().retrofit.create(CovidDataApi::class.java),
+                covidDataDao = getCovidApp().databaseHelper.covidDb.covidDataDao(),
+                lastUpdatedData = getCovidApp().lastUpdatedData,
+                stringGetter = getCovidApp().stringGetter
             ) as T
         }
 
@@ -69,21 +69,52 @@ class CovidActivity : AppCompatActivity() {
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe {
 
-            val currentSelectedUSState = binding?.stateSpinner?.selectedItem
+                val currentSelectedUSState = binding?.stateSpinner?.selectedItem
 
-            if (currentSelectedUSState != it.selectedUsaState) {
-                val position = State.values().indexOf(it.selectedUsaState)
-                binding?.stateSpinner?.setSelection(position)
+                if (currentSelectedUSState != it.selectedUsaState) {
+                    val position = State.values().indexOf(it.selectedUsaState)
+                    binding?.stateSpinner?.setSelection(position)
+                }
+
+                setDateSelectorBasedOnTime(it.amountOfDaysAgoToShow)
+                plotData(it.chartedData)
+            }?.addToComposite(compositeDisposable)
+
+
+    }
+
+    private fun setDateSelectorBasedOnTime(amountOfDaysAgoToShow: Int?) {
+
+        if (amountOfDaysAgoToShow == null) return
+
+        val indexToSelect = when (amountOfDaysAgoToShow) {
+            TimeUtil.THREE_MONTHS_DAYS -> 0
+            TimeUtil.TWO_MONTHS_DAYS -> 1
+            TimeUtil.ONE_MONTH_DAYS -> 2
+            TimeUtil.TWO_WEEKS_DAYS -> 3
+            TimeUtil.FIVE_DAYS -> 4
+            else -> -1
+        }
+
+        val currentlySelectedRadioButtonId = binding?.timeFrame?.checkedRadioButtonId
+        var currentlySelectedIndex: Int? = null
+
+        if (currentlySelectedRadioButtonId != null) {
+            val currentlySelectedRadioButton = binding?.timeFrame?.findViewById<RadioButton>(currentlySelectedRadioButtonId)
+            if (currentlySelectedRadioButton != null) {
+                currentlySelectedIndex = binding?.timeFrame?.indexOfChild(currentlySelectedRadioButton)
             }
-            plotData(it.chartedData)
-        }?.addToComposite(compositeDisposable)
+        }
 
+        if (indexToSelect != -1 && currentlySelectedIndex != indexToSelect) {
+            (binding?.timeFrame?.getChildAt(indexToSelect) as RadioButton).isChecked = true
+        }
 
     }
 
     private fun configureDateSelector() {
 
-        binding?.timeFrame?.setOnCheckedChangeListener(object: RadioGroup.OnCheckedChangeListener {
+        binding?.timeFrame?.setOnCheckedChangeListener(object : RadioGroup.OnCheckedChangeListener {
             override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
                 val radioButton = binding?.timeFrame?.findViewById<RadioButton>(checkedId)
                 val index = binding?.timeFrame?.indexOfChild(radioButton)
@@ -113,23 +144,25 @@ class CovidActivity : AppCompatActivity() {
 
     private fun configureSpinner() {
 
-        binding?.stateSpinner?.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, State.values())
+        binding?.stateSpinner?.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, State.values())
 
-        binding?.stateSpinner?.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        binding?.stateSpinner?.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
 
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                State.values().getOrNull(position)?.let{
-                    viewModel?.setSelectedUSState(it)
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    State.values().getOrNull(position)?.let {
+                        viewModel?.setSelectedUSState(it)
+                    }
                 }
-            }
 
-        }
+            }
     }
 
     private fun plotData(covidDatum: List<CovidData>?) {

@@ -31,4 +31,6 @@ object TimeUtil {
     const val ONE_MONTH_DAYS = 30
     const val TWO_WEEKS_DAYS = 14
     const val FIVE_DAYS = 5
+
+    const val DAY_MILLIS = 24 * 60 * 60 * 1000.toLong()
 }
