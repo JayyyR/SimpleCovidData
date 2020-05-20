@@ -11,6 +11,7 @@ import com.joeracosta.covidtracker.data.db.CovidDataDao
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,6 +31,8 @@ class CovidViewModel(
     private var updateDisposable: Disposable? = null
     val stateSubject = BehaviorSubject.createDefault(defaultState)
 
+    val errorDisplay = PublishSubject.create<Boolean>()
+
     private var daoDisposable: Disposable? = null
     private val currentState: CovidState
         get() = stateSubject.value ?: defaultState
@@ -41,7 +44,7 @@ class CovidViewModel(
     )
 
     init {
-        checkDBForChartData()
+        openConnectionToDBData()
         val updatedMoreThanADayAgo =
             lastUpdatedData.getLastUpdatedTime() + DAY_MILLIS < System.currentTimeMillis()
 
@@ -98,19 +101,20 @@ class CovidViewModel(
 
                 if (success) {
                     lastUpdatedData.setLastUpdatedTime(System.currentTimeMillis())
+                } else {
+                    errorDisplay.onNext(true)
                 }
 
                 updateDisposable?.dispose()
             }
     }
 
-    private fun checkDBForChartData() {
+    private fun openConnectionToDBData() {
         val selectedUsaState = currentState.selectedUsaState
         val amountOfDaysAgoToShow = currentState.amountOfDaysAgoToShow
 
         val selectedAfterDate = getDateToShowFrom(amountOfDaysAgoToShow)
 
-        //only open a new connection if the params have changed
         if (selectedUsaState != null && selectedAfterDate != null) {
             daoDisposable?.dispose()
             daoDisposable = covidDataDao.getPostiveRateByStateAfterDate(
@@ -125,7 +129,7 @@ class CovidViewModel(
                         )
                     )
                 }, {
-                    //todo error
+                    errorDisplay.onNext(true)
                 })
         }
     }
@@ -162,7 +166,7 @@ class CovidViewModel(
 
         //only check if data is new
         if (stateSelectedBefore != currentState.selectedUsaState || amountOfDaysAgoToShow != currentState.amountOfDaysAgoToShow) {
-            checkDBForChartData()
+            openConnectionToDBData()
         }
     }
 

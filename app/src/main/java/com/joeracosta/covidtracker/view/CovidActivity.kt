@@ -18,6 +18,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.google.android.material.snackbar.Snackbar
 import com.joeracosta.covidtracker.CovidApp
 import com.joeracosta.covidtracker.R
 import com.joeracosta.covidtracker.TimeUtil
@@ -49,7 +50,6 @@ class CovidActivity : AppCompatActivity() {
                 stringGetter = getCovidApp().stringGetter
             ) as T
         }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +64,13 @@ class CovidActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CovidViewModel::class.java)
         binding?.viewModel = viewModel
+
+        viewModel?.errorDisplay
+            ?.subscribeOn(Schedulers.io())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe {
+                showError()
+            }?.addToComposite(compositeDisposable)
 
         viewModel?.stateSubject
             ?.subscribeOn(Schedulers.io())
@@ -101,9 +108,11 @@ class CovidActivity : AppCompatActivity() {
         var currentlySelectedIndex: Int? = null
 
         if (currentlySelectedRadioButtonId != null) {
-            val currentlySelectedRadioButton = binding?.timeFrame?.findViewById<RadioButton>(currentlySelectedRadioButtonId)
+            val currentlySelectedRadioButton =
+                binding?.timeFrame?.findViewById<RadioButton>(currentlySelectedRadioButtonId)
             if (currentlySelectedRadioButton != null) {
-                currentlySelectedIndex = binding?.timeFrame?.indexOfChild(currentlySelectedRadioButton)
+                currentlySelectedIndex =
+                    binding?.timeFrame?.indexOfChild(currentlySelectedRadioButton)
             }
         }
 
@@ -168,7 +177,7 @@ class CovidActivity : AppCompatActivity() {
 
     private fun plotData(covidDatum: List<CovidData>?) {
 
-        if (covidDatum != currentChartedData) { //todo test if this works
+        if (covidDatum != currentChartedData) {
             currentChartedData = covidDatum
 
             val entries = arrayListOf<Entry>()
@@ -186,8 +195,8 @@ class CovidActivity : AppCompatActivity() {
             dataPlot.axisDependency = YAxis.AxisDependency.LEFT
 
             dataPlot.lineWidth = 3f
-            dataPlot.setCircleColor(ContextCompat.getColor(this, R.color.darkColorAccent))
-            dataPlot.circleHoleColor = ContextCompat.getColor(this, R.color.darkColorAccent)
+            dataPlot.setCircleColor(ContextCompat.getColor(this, R.color.colorAccent))
+            dataPlot.circleHoleColor = ContextCompat.getColor(this, R.color.colorAccent)
             dataPlot.color = ContextCompat.getColor(this, R.color.colorAccent)
             dataPlot.setDrawValues(false)
 
@@ -197,6 +206,11 @@ class CovidActivity : AppCompatActivity() {
 
         }
 
+    }
+
+    private fun showError() {
+        val rootView = binding?.root ?: return
+        Snackbar.make(rootView, getCovidApp().stringGetter.getString(R.string.error_fetching_data), Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {

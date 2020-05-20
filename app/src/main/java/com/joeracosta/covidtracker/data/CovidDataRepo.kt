@@ -31,7 +31,6 @@ class CovidDataRepo(
                     rawData.toCovidData()
                 }
 
-                //todo check if data needs to be updated (new day)
                 val dataWithThreeDayAverages = calculateThreeDayAverages(covidData)
 
                 updateDatabaseData(dataWithThreeDayAverages).subscribe({ success ->
@@ -42,7 +41,6 @@ class CovidDataRepo(
 
             }, {
                 successObservable.onNext(false)
-                //todo error
             }).addToComposite(compositeDisposable)
 
         return successObservable
@@ -70,7 +68,6 @@ class CovidDataRepo(
                 it.date
             }
 
-            //todo check sorted by date
             //calculate averages
             val listDataWithThreeDayAvgs = list.mapIndexed { index, covidData ->
                 val currentPostiveRate = covidData.postiveTestRate ?: 0.0
@@ -111,12 +108,10 @@ class CovidDataRepo(
                         successObservable.onNext(true)
                     }, {
                         successObservable.onNext(false)
-                        //todo error
                     })
 
             }, {
                 successObservable.onNext(false)
-                //todo error
             }).addToComposite(compositeDisposable)
 
         return successObservable

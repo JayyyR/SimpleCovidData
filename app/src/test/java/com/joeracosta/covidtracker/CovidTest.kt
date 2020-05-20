@@ -12,7 +12,6 @@ class CovidTest {
 
     private val covidRobot get() = CovidRobot()
 
-
     @Before
     fun setUp() {
         RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
