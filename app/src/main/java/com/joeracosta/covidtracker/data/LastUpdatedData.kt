@@ -42,8 +42,8 @@ class LastUpdatedDataConcrete(
         }
     }
 
-    override fun setAmountOfDaysAgoToShow(amountOfDaysAgoToShow: Int) {
-        sharedPreferences.edit().putInt(SELECTED_AMOUNT_OF_DAYS_AGO_TO_SHOW, amountOfDaysAgoToShow).apply()
+    override fun setAmountOfDaysAgoToShow(fromDate: Int) {
+        sharedPreferences.edit().putInt(SELECTED_AMOUNT_OF_DAYS_AGO_TO_SHOW, fromDate).apply()
     }
 
     companion object {
