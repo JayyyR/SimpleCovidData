@@ -13,196 +13,269 @@
             type="com.joeracosta.covidtracker.viewmodel.CovidViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="16dp">
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/refresh_button"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="@{() -> viewModel.refreshData()}"
-            android:text="@string/refresh_data"
-            app:layout_constraintEnd_toStartOf="@+id/update_text"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/update_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_marginEnd="8dp"
-            android:text="@{viewModel.lastUpdatedText}"
-            android:textSize="16sp"
-            android:textStyle="italic"
-            app:layout_constraintBottom_toBottomOf="@+id/loader"
-            app:layout_constraintEnd_toStartOf="@+id/loader"
-            app:layout_constraintStart_toEndOf="@+id/refresh_button"
-            app:layout_constraintTop_toTopOf="@+id/loader" />
-
-        <ProgressBar
-            android:id="@+id/loader"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_margin="16dp"
-            android:visibility="@{viewModel.updatingData ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="@+id/refresh_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/refresh_button" />
-
-
-        <TextView
-            android:id="@+id/chart_title"
-            style="@style/TextAppearance.AppCompat.Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:gravity="center"
-            android:text="@string/chart_title"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toTopOf="@+id/corona_graph"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/refresh_button" />
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/corona_graph"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/time_frame"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chart_title"
-            app:xAxisFormatter="@{viewModel.xAxisFormatter}" />
-
-
-        <RadioGroup
-            android:id="@+id/time_frame"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/state_label"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/corona_graph">
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-            <RadioButton
-                android:id="@+id/three_months"
-                android:layout_width="0dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_height="match_parent">
+
+
+                <TextView
+                    android:id="@+id/app_title"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    style="@style/TextAppearance.AppCompat.Title.Inverse"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/app_doodle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name" />
+
+
+                <ImageView
+                    android:id="@+id/app_doodle"
+                    app:layout_constraintStart_toEndOf="@+id/app_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:src="@drawable/covid_inverted"
+                    android:layout_margin="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.appcompat.widget.Toolbar>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp">
+
+            <Button
+                android:id="@+id/refresh_button"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:autoSizeTextType="uniform"
-                android:background="@drawable/radio_flat_selector"
-                android:button="@android:color/transparent"
-                android:checked="true"
-                android:gravity="center"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:text="@string/three_months"
-                android:textColor="@drawable/radio_flat_text_selector" />
+                android:onClick="@{() -> viewModel.refreshData()}"
+                android:text="@string/refresh_data"
+                app:layout_constraintEnd_toStartOf="@+id/update_text"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <RadioButton
-                android:id="@+id/two_months"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/update_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:autoSizeTextType="uniform"
-                android:background="@drawable/radio_flat_selector"
-                android:button="@android:color/transparent"
-                android:checked="true"
-                android:gravity="center"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:text="@string/two_months"
-                android:textColor="@drawable/radio_flat_text_selector" />
+                android:layout_margin="16dp"
+                android:layout_marginEnd="8dp"
+                android:text="@{viewModel.lastUpdatedText}"
+                android:textSize="16sp"
+                android:textStyle="italic"
+                app:layout_constraintBottom_toBottomOf="@+id/loader"
+                app:layout_constraintEnd_toStartOf="@+id/loader"
+                app:layout_constraintStart_toEndOf="@+id/refresh_button"
+                app:layout_constraintTop_toTopOf="@+id/loader" />
+
+            <ProgressBar
+                android:id="@+id/loader"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_margin="16dp"
+                android:visibility="@{viewModel.updatingData ? View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toBottomOf="@+id/refresh_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/refresh_button" />
 
 
-            <RadioButton
-                android:id="@+id/one_month"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/chart_title"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:autoSizeTextType="uniform"
-                android:background="@drawable/radio_flat_selector"
-                android:button="@android:color/transparent"
-                android:checked="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="1dp"
                 android:gravity="center"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:text="@string/one_month"
-                android:textColor="@drawable/radio_flat_text_selector" />
+                android:text="@string/chart_title"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toTopOf="@+id/chart_subtitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/refresh_button" />
 
-            <RadioButton
-                android:id="@+id/two_weeks"
-                android:layout_width="0dp"
+
+            <TextView
+                android:id="@+id/chart_subtitle"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:autoSizeTextType="uniform"
-                android:background="@drawable/radio_flat_selector"
-                android:button="@android:color/transparent"
-                android:checked="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:gravity="center"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:text="@string/two_weeks"
-                android:textColor="@drawable/radio_flat_text_selector" />
+                android:text="@string/chart_subtitle"
+                android:textSize="15sp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toTopOf="@+id/corona_graph"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/chart_title" />
 
-            <RadioButton
-                android:id="@+id/five_days"
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/corona_graph"
                 android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@+id/time_frame"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/chart_subtitle"
+                app:xAxisFormatter="@{viewModel.xAxisFormatter}" />
+
+
+            <RadioGroup
+                android:id="@+id/time_frame"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:autoSizeTextType="uniform"
-                android:background="@drawable/radio_flat_selector"
-                android:button="@android:color/transparent"
-                android:checked="true"
-                android:gravity="center"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:text="@string/five_days"
-                android:textColor="@drawable/radio_flat_text_selector" />
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toTopOf="@+id/state_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/corona_graph">
 
-        </RadioGroup>
+                <RadioButton
+                    android:id="@+id/three_months"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:background="@drawable/radio_flat_selector"
+                    android:button="@android:color/transparent"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/three_months"
+                    android:textColor="@drawable/radio_flat_text_selector" />
 
-        <TextView
-            android:id="@+id/state_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingTop="32dp"
-            android:paddingBottom="32dp"
-            android:text="@string/choose_state"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/state_spinner"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/time_frame" />
+                <RadioButton
+                    android:id="@+id/two_months"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:background="@drawable/radio_flat_selector"
+                    android:button="@android:color/transparent"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/two_months"
+                    android:textColor="@drawable/radio_flat_text_selector" />
 
 
-        <Spinner
-            android:id="@+id/state_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/state_label"
-            app:layout_constraintBottom_toBottomOf="@id/state_label"
-            app:layout_constraintStart_toEndOf="@+id/state_label" />
+                <RadioButton
+                    android:id="@+id/one_month"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:background="@drawable/radio_flat_selector"
+                    android:button="@android:color/transparent"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/one_month"
+                    android:textColor="@drawable/radio_flat_text_selector" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <RadioButton
+                    android:id="@+id/two_weeks"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:background="@drawable/radio_flat_selector"
+                    android:button="@android:color/transparent"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/two_weeks"
+                    android:textColor="@drawable/radio_flat_text_selector" />
+
+                <RadioButton
+                    android:id="@+id/five_days"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:background="@drawable/radio_flat_selector"
+                    android:button="@android:color/transparent"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/five_days"
+                    android:textColor="@drawable/radio_flat_text_selector" />
+
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/state_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="32dp"
+                android:text="@string/choose_state"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/state_spinner"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/time_frame" />
+
+
+            <Spinner
+                android:id="@+id/state_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/state_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/state_label"
+                app:layout_constraintTop_toTopOf="@+id/state_label" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </layout>

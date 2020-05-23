@@ -4,7 +4,8 @@
     <string name="refresh_data">REFRESH DATA</string>
     <string name="never_updated">Never Updated</string>
     <string name="choose_state">Choose a state:</string>
-    <string name="chart_title">Percentage of Tests with a Positive Result (3-Day Avg)</string>
+    <string name="chart_title">Percentage of Tests with a Positive Result</string>
+    <string name="chart_subtitle">(3-Day Avg)</string>
     <string name="all_time">All Time</string>
     <string name="three_months">3 months</string>
     <string name="one_month">1 month</string>
