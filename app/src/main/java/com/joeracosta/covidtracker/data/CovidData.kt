@@ -31,11 +31,14 @@ data class CovidRawData(
     @SerializedName("date")
     val date: String? = null,
 
-    @SerializedName("positive")
-    val positive: Long? = null,
+    @SerializedName("positiveIncrease")
+    val positiveIncrease: Long? = null,
 
-    @SerializedName("negative")
-    val negative: Long? = null
+    @SerializedName("negativeIncrease")
+    val negativeIncrease: Long? = null,
+
+    @SerializedName("totalTestResultsIncrease")
+    val totalTestResultsIncrease: Long? = null
 
 ) {
     @SuppressLint("SimpleDateFormat")
@@ -46,16 +49,18 @@ data class CovidRawData(
                 val dateFormat = SimpleDateFormat("yyyyMMdd")
                 dateFormat.parse(it)
             },
-            postiveTestRate = positive?.let {
-                negative?. let {
-
-                    if (positive == 0L) {
-                        positive.toDouble()
-                    } else {
-                        (positive.toDouble() / (positive + negative)) * 100
+            postiveTestRate =
+                positiveIncrease?.let {
+                    negativeIncrease?.let {
+                        totalTestResultsIncrease?.let {
+                            if (positiveIncrease == 0L) {
+                                positiveIncrease.toDouble()
+                            } else {
+                                (positiveIncrease.toDouble() / (totalTestResultsIncrease)) * 100
+                            }
+                        }
                     }
                 }
-            }
         )
     }
 }

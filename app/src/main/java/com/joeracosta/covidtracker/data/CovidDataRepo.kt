@@ -70,14 +70,16 @@ class CovidDataRepo(
 
             //calculate averages
             val listDataWithThreeDayAvgs = list.mapIndexed { index, covidData ->
-                val currentPostiveRate = covidData.postiveTestRate ?: 0.0
-                val positiveRateOneDayAgo =
-                    list.getOrNull(index - 1)?.postiveTestRate ?: currentPostiveRate
-                val positiveRateTwoDaysAgo =
-                    list.getOrNull(index - 2)?.postiveTestRate ?: positiveRateOneDayAgo
+                val currentPostiveRate = covidData.postiveTestRate
+                val positiveRateOneDayAgo = list.getOrNull(index - 1)?.postiveTestRate
+                val positiveRateTwoDaysAgo = list.getOrNull(index - 2)?.postiveTestRate
 
                 val threeDayAvg =
-                    (positiveRateOneDayAgo + positiveRateTwoDaysAgo + currentPostiveRate) / 3.0
+                    if (currentPostiveRate != null && positiveRateOneDayAgo != null && positiveRateTwoDaysAgo != null) {
+                        (positiveRateOneDayAgo + positiveRateTwoDaysAgo + currentPostiveRate) / 3.0
+                    } else {
+                        null
+                    }
 
                 covidData.copy(
                     threeDayPostiveTestRateAvg = threeDayAvg
