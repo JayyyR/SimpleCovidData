@@ -191,7 +191,7 @@ class CovidActivity : AppCompatActivity() {
                 }
             }
 
-            val dataPlot = LineDataSet(entries, "Three Day Average")
+            val dataPlot = LineDataSet(entries, getCovidApp().stringGetter.getString(R.string.three_day_avg))
             dataPlot.axisDependency = YAxis.AxisDependency.LEFT
 
             dataPlot.lineWidth = 3f

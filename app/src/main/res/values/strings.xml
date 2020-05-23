@@ -11,5 +11,6 @@
     <string name="two_weeks">2 weeks</string>
     <string name="five_days">5 days</string>
     <string name="two_months">2 months</string>
+    <string name="three_day_avg">Three Day Average</string>
     <string name="error_fetching_data">Error Fetching Data</string>
 </resources>
