@@ -74,15 +74,27 @@ class CovidDataRepo(
                 val positiveRateOneDayAgo = list.getOrNull(index - 1)?.postiveTestRate
                 val positiveRateTwoDaysAgo = list.getOrNull(index - 2)?.postiveTestRate
 
-                val threeDayAvg =
+                val postiveTestRateThreeDayAvg =
                     if (currentPostiveRate != null && positiveRateOneDayAgo != null && positiveRateTwoDaysAgo != null) {
                         (positiveRateOneDayAgo + positiveRateTwoDaysAgo + currentPostiveRate) / 3.0
                     } else {
                         null
                     }
 
+                val currentNewHospitalizations = covidData.newHospitalizations
+                val newHospitalizationsOneDayAgo = list.getOrNull(index - 1)?.newHospitalizations
+                val newHospitalizationsTwoDaysAgo = list.getOrNull(index - 2)?.newHospitalizations
+
+                val newHospitalizationsThreeDayAvg =
+                    if (currentNewHospitalizations != null && newHospitalizationsOneDayAgo != null && newHospitalizationsTwoDaysAgo != null) {
+                        (currentNewHospitalizations + newHospitalizationsOneDayAgo + newHospitalizationsTwoDaysAgo) / 3.0
+                    } else {
+                        null
+                    }
+
                 covidData.copy(
-                    threeDayPostiveTestRateAvg = threeDayAvg
+                    postiveTestRateThreeDayAvg = postiveTestRateThreeDayAvg,
+                    newHospitalizationsThreeDayAverage = newHospitalizationsThreeDayAvg
                 )
 
             }

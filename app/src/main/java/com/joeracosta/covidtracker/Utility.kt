@@ -1,5 +1,7 @@
 package com.joeracosta.covidtracker
 
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.databinding.BindingAdapter
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.AxisBase
@@ -22,6 +24,16 @@ fun LineChart.setXAxisLabelFormatter(xAxisFormatter: (Float) -> String) {
         }
     val xAxis = this.xAxis
     xAxis?.valueFormatter = formatter
+}
+
+@BindingAdapter("radioGroupIndexListener")
+fun RadioGroup.setIndexListener(indexClickedListener: (Int) -> Unit) {
+    this.setOnCheckedChangeListener { group, checkedId ->
+        val radioButton = group.findViewById<RadioButton>(checkedId)
+        val index = group.indexOfChild(radioButton)
+
+        indexClickedListener.invoke(index)
+    }
 }
 
 object TimeUtil {

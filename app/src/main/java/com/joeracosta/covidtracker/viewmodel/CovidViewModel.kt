@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.databinding.Bindable
 import com.joeracosta.covidtracker.BaseObservableViewModel
 import com.joeracosta.covidtracker.R
+import com.joeracosta.covidtracker.TimeUtil
 import com.joeracosta.covidtracker.TimeUtil.DAY_MILLIS
 import com.joeracosta.covidtracker.TimeUtil.TWO_MONTHS_DAYS
 import com.joeracosta.covidtracker.data.*
@@ -24,7 +25,8 @@ class CovidViewModel(
 
     private val defaultState = CovidState(
         selectedUsaState = lastUpdatedData.getSelectedUSState() ?: State.NEW_YORK,
-        amountOfDaysAgoToShow = lastUpdatedData.getAmountOfDaysAgoToShow() ?: TWO_MONTHS_DAYS
+        amountOfDaysAgoToShow = lastUpdatedData.getAmountOfDaysAgoToShow() ?: TWO_MONTHS_DAYS,
+        dataToPlot = DataToPlot.POSITIVE_CASE_RATE //todo store properly
     )
 
     private val compositeDisposable = CompositeDisposable()
@@ -53,6 +55,25 @@ class CovidViewModel(
         }
     }
 
+    val dataPlotIndexListener: (Int) -> Unit = { index ->
+        when (index) {
+            0 -> setDataToPlot(DataToPlot.POSITIVE_CASE_RATE)
+            1 -> setDataToPlot(DataToPlot.NEW_HOSPITALIZATIONS)
+        }
+
+    }
+
+    val timeFrameIndexListener: (Int) -> Unit = { index ->
+        when (index) {
+            0 -> setSelectedTimeFrame(TimeUtil.THREE_MONTHS_DAYS)
+            1 -> setSelectedTimeFrame(TimeUtil.TWO_MONTHS_DAYS)
+            2 -> setSelectedTimeFrame(TimeUtil.ONE_MONTH_DAYS)
+            3 -> setSelectedTimeFrame(TimeUtil.TWO_WEEKS_DAYS)
+            4 -> setSelectedTimeFrame(TimeUtil.FIVE_DAYS)
+        }
+
+    }
+
     @SuppressLint("SimpleDateFormat")
     fun getXAxisFormatter(): (Float) -> String {
         val labelCalender = Calendar.getInstance()
@@ -68,6 +89,15 @@ class CovidViewModel(
     @Bindable
     fun getUpdatingData(): Boolean {
         return currentState.updatingData == true
+    }
+
+    @Bindable
+    fun getChartTitle(): String {
+        return when (currentState.dataToPlot) {
+            DataToPlot.POSITIVE_CASE_RATE -> stringGetter.getString(R.string.positive_rate_chart_title)
+            DataToPlot.NEW_HOSPITALIZATIONS -> stringGetter.getString(R.string.new_hospitalizations_chart_title)
+            else -> ""
+        }
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -144,6 +174,15 @@ class CovidViewModel(
         )
     }
 
+    fun setDataToPlot(dataToPlot: DataToPlot) {
+
+        updateState(
+            currentState.copy(
+                dataToPlot = dataToPlot
+            )
+        )
+    }
+
     fun setSelectedTimeFrame(amountOfDaysAgoToShow: Int) {
         lastUpdatedData.setAmountOfDaysAgoToShow(amountOfDaysAgoToShow)
         updateState(
@@ -151,7 +190,6 @@ class CovidViewModel(
                 amountOfDaysAgoToShow = amountOfDaysAgoToShow
             )
         )
-
     }
 
     private fun updateState(newCovidState: CovidState) {
@@ -172,7 +210,7 @@ class CovidViewModel(
 
 
     private fun getDateToShowFrom(amountOfDaysAgoToShow: Int?): Date? {
-        if (amountOfDaysAgoToShow == null ) return null
+        if (amountOfDaysAgoToShow == null) return null
 
         return Date().apply {
             time = System.currentTimeMillis() - (amountOfDaysAgoToShow * DAY_MILLIS)

@@ -14,9 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.google.android.material.snackbar.Snackbar
 import com.joeracosta.covidtracker.CovidApp
@@ -25,6 +23,7 @@ import com.joeracosta.covidtracker.TimeUtil
 import com.joeracosta.covidtracker.addToComposite
 import com.joeracosta.covidtracker.data.CovidData
 import com.joeracosta.covidtracker.data.CovidDataApi
+import com.joeracosta.covidtracker.data.DataToPlot
 import com.joeracosta.covidtracker.data.State
 import com.joeracosta.covidtracker.databinding.ActivityMainBinding
 import com.joeracosta.covidtracker.viewmodel.CovidViewModel
@@ -39,6 +38,7 @@ class CovidActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
     private val compositeDisposable = CompositeDisposable()
     private var currentChartedData: List<CovidData>? = null
+    private var currentPlottedDataType: DataToPlot? = null
 
     private val viewModelFactory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -60,7 +60,6 @@ class CovidActivity : AppCompatActivity() {
         binding?.coronaGraph?.description = null
 
         configureSpinner()
-        configureDateSelector()
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CovidViewModel::class.java)
         binding?.viewModel = viewModel
@@ -85,7 +84,7 @@ class CovidActivity : AppCompatActivity() {
                 }
 
                 setDateSelectorBasedOnTime(it.amountOfDaysAgoToShow)
-                plotData(it.chartedData)
+                plotData(it.chartedData, it.dataToPlot)
             }?.addToComposite(compositeDisposable)
 
 
@@ -175,42 +174,52 @@ class CovidActivity : AppCompatActivity() {
             }
     }
 
-    private fun plotData(covidDatum: List<CovidData>?) {
+    private fun plotData(covidDatum: List<CovidData>?, dataToPlot: DataToPlot?) {
 
-        if (covidDatum != currentChartedData) {
+        if (covidDatum != currentChartedData || currentPlottedDataType != dataToPlot) {
             currentChartedData = covidDatum
+            currentPlottedDataType = dataToPlot
 
             val entries = arrayListOf<Entry>()
             covidDatum?.forEach {
 
                 val dateFloat = it.date?.time?.toFloat()
-                val threeDayAvg = it.threeDayPostiveTestRateAvg?.toFloat()
 
-                if (dateFloat != null && threeDayAvg != null) {
-                    entries.add(Entry(dateFloat, threeDayAvg))
+                val dataToDisplay = when (dataToPlot) {
+                    DataToPlot.POSITIVE_CASE_RATE -> it.postiveTestRateThreeDayAvg?.toFloat()
+                    DataToPlot.NEW_HOSPITALIZATIONS -> it.newHospitalizationsThreeDayAverage?.toFloat()
+                    else -> null
+                }
+
+                if (dateFloat != null && dataToDisplay != null) {
+                    entries.add(Entry(dateFloat, dataToDisplay))
                 }
             }
 
-            val dataPlot = LineDataSet(entries, getCovidApp().stringGetter.getString(R.string.three_day_avg))
-            dataPlot.axisDependency = YAxis.AxisDependency.LEFT
+            val dataSet =
+                LineDataSet(entries, getCovidApp().stringGetter.getString(R.string.three_day_avg))
+            dataSet.axisDependency = YAxis.AxisDependency.LEFT
 
-            dataPlot.lineWidth = 3f
-            dataPlot.setCircleColor(ContextCompat.getColor(this, R.color.colorAccent))
-            dataPlot.circleHoleColor = ContextCompat.getColor(this, R.color.colorAccent)
-            dataPlot.color = ContextCompat.getColor(this, R.color.colorAccent)
-            dataPlot.setDrawValues(false)
+            dataSet.lineWidth = 3f
+            dataSet.setCircleColor(ContextCompat.getColor(this, R.color.colorAccent))
+            dataSet.circleHoleColor = ContextCompat.getColor(this, R.color.colorAccent)
+            dataSet.color = ContextCompat.getColor(this, R.color.colorAccent)
+            dataSet.setDrawValues(false)
 
-
-            binding?.coronaGraph?.data = LineData(arrayListOf(dataPlot) as List<ILineDataSet>?)
+            binding?.coronaGraph?.data =
+                LineData(arrayListOf(dataSet) as List<ILineDataSet>?)
             binding?.coronaGraph?.invalidate()
 
         }
-
     }
 
     private fun showError() {
         val rootView = binding?.root ?: return
-        Snackbar.make(rootView, getCovidApp().stringGetter.getString(R.string.error_fetching_data), Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(
+            rootView,
+            getCovidApp().stringGetter.getString(R.string.error_fetching_data),
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     override fun onDestroy() {
