@@ -301,12 +301,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="16dp"
-                android:paddingTop="32dp"
-                android:paddingBottom="32dp"
+                android:paddingTop="28dp"
+                android:paddingBottom="28dp"
                 android:text="@string/choose_state"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/disclaimer"
                 app:layout_constraintEnd_toStartOf="@+id/state_spinner"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintStart_toStartOf="parent"
@@ -322,6 +322,21 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/state_label"
                 app:layout_constraintTop_toTopOf="@+id/state_label" />
+
+
+            <TextView
+                android:id="@+id/disclaimer"
+                android:textSize="10sp"
+                tools:text="disclaimer text"
+                android:text="@{viewModel.disclaimerText}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="center"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintTop_toBottomOf="@+id/state_label"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>

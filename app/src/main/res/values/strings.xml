@@ -17,4 +17,5 @@
     <string name="two_months">2 months</string>
     <string name="three_day_avg">Three Day Average</string>
     <string name="error_fetching_data">Error Fetching Data</string>
+    <string name="new_hospitalizations_disclaimer">Note: Some states don\'t report new hospitalizations. Data may be missing.</string>
 </resources>

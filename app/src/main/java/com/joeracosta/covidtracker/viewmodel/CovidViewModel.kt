@@ -118,6 +118,15 @@ class CovidViewModel(
         return if (lastUpdatedTime == 0L) stringGetter.getString(R.string.never_updated) else "Last Updated $formatted"
     }
 
+    @Bindable
+    fun getDisclaimerText(): String {
+        return when (currentState.dataToPlot) {
+            DataToPlot.POSITIVE_CASE_RATE -> ""
+            DataToPlot.NEW_HOSPITALIZATIONS -> stringGetter.getString(R.string.new_hospitalizations_disclaimer)
+            else -> ""
+        }
+    }
+
     fun refreshData() {
         updateState(
             currentState.copy(updatingData = true)
