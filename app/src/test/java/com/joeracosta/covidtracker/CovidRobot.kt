@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.joeracosta.covidtracker.data.State
 import com.joeracosta.covidtracker.viewmodel.CovidViewModel
 import com.joeracosta.covidtracker.BaseObservableViewModel
+import com.joeracosta.covidtracker.data.DataToPlot
 
 class CovidRobot {
 
@@ -25,8 +26,20 @@ class CovidRobot {
         viewModel.setSelectedTimeFrame(amountOfDaysAgoToShow)
     }
 
+    fun setDatToPlot(dataToPlot: DataToPlot) = apply {
+        viewModel.setDataToPlot(dataToPlot)
+    }
+
     fun forceRefresh() = apply {
         viewModel.refreshData()
+    }
+
+    fun assertSelectedDataToPlot(selectedDataToPlot: DataToPlot) = apply {
+        assertThat(viewModel.stateSubject.value?.dataToPlot).isEqualTo(selectedDataToPlot)
+    }
+
+    fun assertStoredSelectedDataToPlot(selectedDataToPlot: DataToPlot) = apply {
+        assertThat(lastUpdatedData.storedDataToPlot).isEqualTo(selectedDataToPlot)
     }
 
     fun assertSelectedState(selectedState: State) = apply {

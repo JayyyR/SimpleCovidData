@@ -1,5 +1,6 @@
 package com.joeracosta.covidtracker
 
+import com.joeracosta.covidtracker.data.DataToPlot
 import com.joeracosta.covidtracker.data.State
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
@@ -32,6 +33,14 @@ class CovidTest {
             .setSelectedTimeFrame(30)
             .assertAmountOfDaysAgoToShow(30)
             .assertAmountOfDaysAgoToShowIsStored(30)
+    }
+
+    @Test
+    fun testDataToPlot() {
+        covidRobot
+            .setDatToPlot(DataToPlot.NEW_HOSPITALIZATIONS)
+            .assertSelectedDataToPlot(DataToPlot.NEW_HOSPITALIZATIONS)
+            .assertStoredSelectedDataToPlot(DataToPlot.NEW_HOSPITALIZATIONS)
     }
 
     @Test
