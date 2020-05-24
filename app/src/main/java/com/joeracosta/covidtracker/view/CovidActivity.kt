@@ -83,9 +83,35 @@ class CovidActivity : AppCompatActivity() {
                     binding?.stateSpinner?.setSelection(position)
                 }
 
+                setDataPlotSelector(it.dataToPlot)
                 setDateSelectorBasedOnTime(it.amountOfDaysAgoToShow)
                 plotData(it.chartedData, it.dataToPlot)
             }?.addToComposite(compositeDisposable)
+
+
+    }
+
+    private fun setDataPlotSelector(dataToPlot: DataToPlot?) {
+        val indexToSelect = when (dataToPlot) {
+            DataToPlot.POSITIVE_CASE_RATE -> 0
+            DataToPlot.NEW_HOSPITALIZATIONS -> 1
+            else -> -1
+        }
+
+        var currentlySelectedIndex: Int? = null
+        val currentlySelectedRadioButtonId = binding?.dataToPlotPicker?.checkedRadioButtonId
+        if (currentlySelectedRadioButtonId != null) {
+            val currentlySelectedRadioButton =
+                binding?.dataToPlotPicker?.findViewById<RadioButton>(currentlySelectedRadioButtonId)
+            if (currentlySelectedRadioButton != null) {
+                currentlySelectedIndex =
+                    binding?.dataToPlotPicker?.indexOfChild(currentlySelectedRadioButton)
+            }
+        }
+
+        if (indexToSelect != -1 && currentlySelectedIndex != indexToSelect) {
+            (binding?.dataToPlotPicker?.getChildAt(indexToSelect) as RadioButton).isChecked = true
+        }
 
 
     }
@@ -103,9 +129,9 @@ class CovidActivity : AppCompatActivity() {
             else -> -1
         }
 
-        val currentlySelectedRadioButtonId = binding?.timeFrame?.checkedRadioButtonId
         var currentlySelectedIndex: Int? = null
 
+        val currentlySelectedRadioButtonId = binding?.timeFrame?.checkedRadioButtonId
         if (currentlySelectedRadioButtonId != null) {
             val currentlySelectedRadioButton =
                 binding?.timeFrame?.findViewById<RadioButton>(currentlySelectedRadioButtonId)
@@ -118,36 +144,6 @@ class CovidActivity : AppCompatActivity() {
         if (indexToSelect != -1 && currentlySelectedIndex != indexToSelect) {
             (binding?.timeFrame?.getChildAt(indexToSelect) as RadioButton).isChecked = true
         }
-
-    }
-
-    private fun configureDateSelector() {
-
-        binding?.timeFrame?.setOnCheckedChangeListener(object : RadioGroup.OnCheckedChangeListener {
-            override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
-                val radioButton = binding?.timeFrame?.findViewById<RadioButton>(checkedId)
-                val index = binding?.timeFrame?.indexOfChild(radioButton)
-
-                when (index) {
-                    0 -> {
-                        viewModel?.setSelectedTimeFrame(TimeUtil.THREE_MONTHS_DAYS)
-                    }
-                    1 -> {
-                        viewModel?.setSelectedTimeFrame(TimeUtil.TWO_MONTHS_DAYS)
-                    }
-                    2 -> {
-                        viewModel?.setSelectedTimeFrame(TimeUtil.ONE_MONTH_DAYS)
-                    }
-                    3 -> {
-                        viewModel?.setSelectedTimeFrame(TimeUtil.TWO_WEEKS_DAYS)
-                    }
-                    4 -> {
-                        viewModel?.setSelectedTimeFrame(TimeUtil.FIVE_DAYS)
-                    }
-                }
-            }
-
-        })
 
     }
 
