@@ -26,7 +26,7 @@ class CovidViewModel(
     private val defaultState = CovidState(
         selectedUsaState = lastUpdatedData.getSelectedUSState() ?: State.NEW_YORK,
         amountOfDaysAgoToShow = lastUpdatedData.getAmountOfDaysAgoToShow() ?: TWO_MONTHS_DAYS,
-        dataToPlot = DataToPlot.POSITIVE_CASE_RATE //todo store properly
+        dataToPlot = lastUpdatedData.getDataToPlot() ?: DataToPlot.POSITIVE_CASE_RATE
     )
 
     private val compositeDisposable = CompositeDisposable()
@@ -175,7 +175,7 @@ class CovidViewModel(
     }
 
     fun setDataToPlot(dataToPlot: DataToPlot) {
-
+        lastUpdatedData.setDataToPlot(dataToPlot)
         updateState(
             currentState.copy(
                 dataToPlot = dataToPlot

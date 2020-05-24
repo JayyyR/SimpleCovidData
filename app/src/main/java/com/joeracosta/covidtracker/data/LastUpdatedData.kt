@@ -1,7 +1,6 @@
 package com.joeracosta.covidtracker.data
 
 import android.content.SharedPreferences
-import java.util.*
 
 interface LastUpdatedData {
     fun getLastUpdatedTime(): Long
@@ -10,6 +9,8 @@ interface LastUpdatedData {
     fun getSelectedUSState(): State?
     fun getAmountOfDaysAgoToShow(): Int?
     fun setAmountOfDaysAgoToShow(fromDate: Int)
+    fun getDataToPlot(): DataToPlot?
+    fun setDataToPlot(dataToPlot: DataToPlot)
 }
 
 class LastUpdatedDataConcrete(
@@ -46,9 +47,23 @@ class LastUpdatedDataConcrete(
         sharedPreferences.edit().putInt(SELECTED_AMOUNT_OF_DAYS_AGO_TO_SHOW, fromDate).apply()
     }
 
+    override fun getDataToPlot(): DataToPlot? {
+        val dataToPlotId = sharedPreferences.getInt(SELECTED_DATA_TO_PLOT, -1)
+        return if (dataToPlotId != -1) {
+            DataToPlot.values().find { it.id == dataToPlotId }
+        } else {
+            null
+        }
+    }
+
+    override fun setDataToPlot(dataToPlot: DataToPlot) {
+        sharedPreferences.edit().putInt(SELECTED_DATA_TO_PLOT, dataToPlot.id).apply()
+    }
+
     companion object {
         const val LAST_UPDATED_TIME = "com.joeracosta.last_update_time"
         const val SELECTED_STATE = "com.joeracosta.selected_state"
         const val SELECTED_AMOUNT_OF_DAYS_AGO_TO_SHOW = "com.joeracosta.selected_time_frame"
+        const val SELECTED_DATA_TO_PLOT = "com.joeracosta.selected_data_to_plot"
     }
 }
