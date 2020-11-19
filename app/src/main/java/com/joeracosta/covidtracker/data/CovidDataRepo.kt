@@ -8,6 +8,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import kotlin.collections.ArrayList
 
 class CovidDataRepo(
     private val covidDataApi: CovidDataApi,
@@ -70,6 +71,7 @@ class CovidDataRepo(
             //calculate averages
             val listDataWithSevenDayAvgs = list.mapIndexed { index, covidData ->
 
+
                 val lastSevenDaysPositiveRate = if (index >= 6) {
                     list.slice(index - 6..index).map {
                         it.postiveTestRate
@@ -79,7 +81,8 @@ class CovidDataRepo(
                 }
 
                 //sometimes days have null data because of garabage from the API but we still want to calculate averages from the data we have
-                val positiveRateFromActualDaysWithDataFromLastSeven = lastSevenDaysPositiveRate?.filterNotNull()
+                val positiveRateFromActualDaysWithDataFromLastSeven =
+                    lastSevenDaysPositiveRate?.filterNotNull()
 
                 val postiveTestRateSevenDayAvg =
                     if (positiveRateFromActualDaysWithDataFromLastSeven != null) {

@@ -67,7 +67,7 @@ data class CovidRawData(
                         null
                     }
 
-                when {
+                val postiveTestRate = when {
                     positiveIncrease == 0L -> {
                         positiveIncrease.toDouble()
                     }
@@ -78,6 +78,14 @@ data class CovidRawData(
                         null
                     }
                 }
+
+                //todo there are still anomalies like this...should I get rid of em?
+                /* Weird anomaly example with NJ in SEPT
+                if (postiveTestRate == 29.20353982300885 && state == State.NEW_JERSEY) {
+                    println()
+                }*/
+
+                postiveTestRate
 
             },
             hospitalizedCurrently = hospitalizedCurrently
