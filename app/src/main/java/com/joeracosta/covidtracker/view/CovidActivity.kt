@@ -192,8 +192,8 @@ class CovidActivity : AppCompatActivity() {
                 }
             }
 
-            val dataSet =
-                LineDataSet(entries, getCovidApp().stringGetter.getString(R.string.seven_day_avg))
+            val dataSet = LineDataSet(entries, "")
+
             dataSet.axisDependency = YAxis.AxisDependency.LEFT
 
             dataSet.lineWidth = 3f
@@ -202,6 +202,8 @@ class CovidActivity : AppCompatActivity() {
             dataSet.color = ContextCompat.getColor(this, R.color.colorAccent)
             dataSet.setDrawValues(false)
 
+
+            binding?.coronaGraph?.legend?.isEnabled = false
             binding?.coronaGraph?.data =
                 LineData(arrayListOf(dataSet) as List<ILineDataSet>?)
             binding?.coronaGraph?.invalidate()
