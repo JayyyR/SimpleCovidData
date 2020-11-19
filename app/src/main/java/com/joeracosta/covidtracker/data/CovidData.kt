@@ -55,17 +55,15 @@ data class CovidRawData(
                 dateFormat.parse(it)
             },
             postiveTestRate =
-                positiveIncrease?.let {
-                    negativeIncrease?.let {
-                        totalTestResultsIncrease?.let {
-                            if (positiveIncrease == 0L) {
-                                positiveIncrease.toDouble()
-                            } else {
-                                (positiveIncrease.toDouble() / (totalTestResultsIncrease)) * 100
-                            }
-                        }
+            positiveIncrease?.let {
+                totalTestResultsIncrease?.let {
+                    if (positiveIncrease == 0L) {
+                        positiveIncrease.toDouble()
+                    } else {
+                        (positiveIncrease.toDouble() / (totalTestResultsIncrease)) * 100
                     }
-                },
+                }
+            },
             hospitalizedCurrently = hospitalizedCurrently
         )
     }
