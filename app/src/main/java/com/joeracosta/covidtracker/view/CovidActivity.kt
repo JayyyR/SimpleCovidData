@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -121,11 +120,12 @@ class CovidActivity : AppCompatActivity() {
         if (amountOfDaysAgoToShow == null) return
 
         val indexToSelect = when (amountOfDaysAgoToShow) {
-            TimeUtil.THREE_MONTHS_DAYS -> 0
-            TimeUtil.TWO_MONTHS_DAYS -> 1
-            TimeUtil.ONE_MONTH_DAYS -> 2
-            TimeUtil.TWO_WEEKS_DAYS -> 3
-            TimeUtil.FIVE_DAYS -> 4
+            TimeUtil.ALL_TIME_DAYS -> 0
+            TimeUtil.SIX_MONTHS_DAYS -> 1
+            TimeUtil.THREE_MONTHS_DAYS -> 2
+            TimeUtil.ONE_MONTH_DAYS -> 3
+            TimeUtil.TWO_WEEKS_DAYS -> 4
+            TimeUtil.FIVE_DAYS -> 5
             else -> -1
         }
 
@@ -182,7 +182,7 @@ class CovidActivity : AppCompatActivity() {
                 val dateFloat = it.date?.time?.toFloat()
 
                 val dataToDisplay = when (dataToPlot) {
-                    DataToPlot.POSITIVE_CASE_RATE -> it.postiveTestRateThreeDayAvg?.toFloat()
+                    DataToPlot.POSITIVE_CASE_RATE -> it.postiveTestRateSevenDayAvg?.toFloat()
                     DataToPlot.NEW_HOSPITALIZATIONS -> it.newHospitalizationsThreeDayAverage?.toFloat()
                     else -> null
                 }
@@ -193,7 +193,7 @@ class CovidActivity : AppCompatActivity() {
             }
 
             val dataSet =
-                LineDataSet(entries, getCovidApp().stringGetter.getString(R.string.three_day_avg))
+                LineDataSet(entries, getCovidApp().stringGetter.getString(R.string.seven_day_avg))
             dataSet.axisDependency = YAxis.AxisDependency.LEFT
 
             dataSet.lineWidth = 3f

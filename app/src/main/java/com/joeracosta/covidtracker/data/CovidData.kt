@@ -19,7 +19,7 @@ data class CovidData(
 
     val postiveTestRate: Double? = null,
 
-    val postiveTestRateThreeDayAvg: Double? = null,
+    val postiveTestRateSevenDayAvg: Double? = null,
 
     val newHospitalizations: Long? = null,
 

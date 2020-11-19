@@ -6,16 +6,17 @@
     <string name="choose_state">Choose a state:</string>
     <string name="positive_rate_chart_title">Percentage of Tests with a Positive Result</string>
     <string name="new_hospitalizations_chart_title">New Hospitalizations</string>
-    <string name="chart_subtitle">(3-Day Avg)</string>
+    <string name="chart_subtitle">(7-Day Avg)</string>
     <string name="all_time">All Time</string>
-    <string name="three_months">3 months</string>
-    <string name="one_month">1 month</string>
+    <string name="six_months">6 Months</string>
+    <string name="three_months">3 Months</string>
+    <string name="one_month">1 Month</string>
     <string name="positive_test_rate">Positive Test Rate</string>
     <string name="new_hospitalizations">New Hospitalizations</string>
-    <string name="two_weeks">2 weeks</string>
-    <string name="five_days">5 days</string>
-    <string name="two_months">2 months</string>
-    <string name="three_day_avg">Three Day Average</string>
+    <string name="two_weeks">2 Weeks</string>
+    <string name="five_days">5 Days</string>
+    <string name="two_months">2 Months</string>
+    <string name="seven_day_avg">Seven Day Average</string>
     <string name="error_fetching_data">Error Fetching Data</string>
     <string name="new_hospitalizations_disclaimer">Note: Some states don\'t report new hospitalizations. Data may be missing.</string>
 </resources>

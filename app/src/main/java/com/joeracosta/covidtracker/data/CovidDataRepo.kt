@@ -2,7 +2,6 @@ package com.joeracosta.covidtracker.data
 
 import com.joeracosta.covidtracker.addToComposite
 import com.joeracosta.covidtracker.data.db.CovidDataDao
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -31,9 +30,9 @@ class CovidDataRepo(
                     rawData.toCovidData()
                 }
 
-                val dataWithThreeDayAverages = calculateThreeDayAverages(covidData)
+                val dataWithSevenDayAverages = calculateSevenDayAverages(covidData)
 
-                updateDatabaseData(dataWithThreeDayAverages).subscribe({ success ->
+                updateDatabaseData(dataWithSevenDayAverages).subscribe({ success ->
                     successObservable.onNext(success)
                 }, {
                     successObservable.onNext(false)
@@ -46,7 +45,7 @@ class CovidDataRepo(
         return successObservable
     }
 
-    private fun calculateThreeDayAverages(covidData: List<CovidData>): List<CovidData> {
+    private fun calculateSevenDayAverages(covidData: List<CovidData>): List<CovidData> {
 
         val mapOfStateData = hashMapOf<State, ArrayList<CovidData>>()
 
@@ -69,14 +68,19 @@ class CovidDataRepo(
             }
 
             //calculate averages
-            val listDataWithThreeDayAvgs = list.mapIndexed { index, covidData ->
-                val currentPostiveRate = covidData.postiveTestRate
-                val positiveRateOneDayAgo = list.getOrNull(index - 1)?.postiveTestRate
-                val positiveRateTwoDaysAgo = list.getOrNull(index - 2)?.postiveTestRate
+            val listDataWithSevenDayAvgs = list.mapIndexed { index, covidData ->
 
-                val postiveTestRateThreeDayAvg =
-                    if (currentPostiveRate != null && positiveRateOneDayAgo != null && positiveRateTwoDaysAgo != null) {
-                        (positiveRateOneDayAgo + positiveRateTwoDaysAgo + currentPostiveRate) / 3.0
+                val lastSevenDaysPositiveRate = if (index >= 6) {
+                    list.slice(index - 6..index).map {
+                        it.postiveTestRate
+                    }
+                } else {
+                    null
+                }
+
+                val postiveTestRateSevenDayAvg =
+                    if (lastSevenDaysPositiveRate?.filterNotNull()?.size == 7) {
+                        (lastSevenDaysPositiveRate.filterNotNull().sumByDouble { it }) / 7.0
                     } else {
                         null
                     }
@@ -93,13 +97,13 @@ class CovidDataRepo(
                     }
 
                 covidData.copy(
-                    postiveTestRateThreeDayAvg = postiveTestRateThreeDayAvg,
+                    postiveTestRateSevenDayAvg = postiveTestRateSevenDayAvg,
                     newHospitalizationsThreeDayAverage = newHospitalizationsThreeDayAvg
                 )
 
             }
 
-            listDataWithThreeDayAvgs
+            listDataWithSevenDayAvgs
         }
 
         return listOfStateDataWithAverages.flatten()

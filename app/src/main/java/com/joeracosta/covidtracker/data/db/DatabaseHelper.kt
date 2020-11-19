@@ -10,7 +10,7 @@ class DatabaseHelper(val appContext: Context){
 
     val covidDb by lazy {
         Room.databaseBuilder(appContext, CovidDatabase::class.java, DB_NAME)
-            .fallbackToDestructiveMigrationFrom(1)
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -21,7 +21,7 @@ class DatabaseHelper(val appContext: Context){
 
 @Database(
     entities = [CovidData::class],
-    version = 2
+    version = 3
 )
 @TypeConverters(value = [Converters::class])
 abstract class CovidDatabase: RoomDatabase() {

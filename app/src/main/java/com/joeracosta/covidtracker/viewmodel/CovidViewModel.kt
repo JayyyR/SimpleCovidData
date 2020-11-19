@@ -5,8 +5,8 @@ import androidx.databinding.Bindable
 import com.joeracosta.covidtracker.BaseObservableViewModel
 import com.joeracosta.covidtracker.R
 import com.joeracosta.covidtracker.TimeUtil
+import com.joeracosta.covidtracker.TimeUtil.ALL_TIME_DAYS
 import com.joeracosta.covidtracker.TimeUtil.DAY_MILLIS
-import com.joeracosta.covidtracker.TimeUtil.TWO_MONTHS_DAYS
 import com.joeracosta.covidtracker.data.*
 import com.joeracosta.covidtracker.data.db.CovidDataDao
 import io.reactivex.disposables.CompositeDisposable
@@ -25,7 +25,7 @@ class CovidViewModel(
 
     private val defaultState = CovidState(
         selectedUsaState = lastUpdatedData.getSelectedUSState() ?: State.NEW_YORK,
-        amountOfDaysAgoToShow = lastUpdatedData.getAmountOfDaysAgoToShow() ?: TWO_MONTHS_DAYS,
+        amountOfDaysAgoToShow = lastUpdatedData.getAmountOfDaysAgoToShow() ?: ALL_TIME_DAYS,
         dataToPlot = lastUpdatedData.getDataToPlot() ?: DataToPlot.POSITIVE_CASE_RATE
     )
 
@@ -65,11 +65,12 @@ class CovidViewModel(
 
     val timeFrameIndexListener: (Int) -> Unit = { index ->
         when (index) {
-            0 -> setSelectedTimeFrame(TimeUtil.THREE_MONTHS_DAYS)
-            1 -> setSelectedTimeFrame(TimeUtil.TWO_MONTHS_DAYS)
-            2 -> setSelectedTimeFrame(TimeUtil.ONE_MONTH_DAYS)
-            3 -> setSelectedTimeFrame(TimeUtil.TWO_WEEKS_DAYS)
-            4 -> setSelectedTimeFrame(TimeUtil.FIVE_DAYS)
+            0 -> setSelectedTimeFrame(TimeUtil.ALL_TIME_DAYS)
+            1 -> setSelectedTimeFrame(TimeUtil.SIX_MONTHS_DAYS)
+            2 -> setSelectedTimeFrame(TimeUtil.THREE_MONTHS_DAYS)
+            3 -> setSelectedTimeFrame(TimeUtil.ONE_MONTH_DAYS)
+            4 -> setSelectedTimeFrame(TimeUtil.TWO_WEEKS_DAYS)
+            5 -> setSelectedTimeFrame(TimeUtil.FIVE_DAYS)
         }
 
     }
