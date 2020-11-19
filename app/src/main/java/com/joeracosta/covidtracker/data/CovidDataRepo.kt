@@ -78,9 +78,12 @@ class CovidDataRepo(
                     null
                 }
 
+                //sometimes days have null data because of garabage from the API but we still want to calculate averages from the data we have
+                val positiveRateFromActualDaysWithDataFromLastSeven = lastSevenDaysPositiveRate?.filterNotNull()
+
                 val postiveTestRateSevenDayAvg =
-                    if (lastSevenDaysPositiveRate?.filterNotNull()?.size == 7) {
-                        (lastSevenDaysPositiveRate.filterNotNull().sumByDouble { it }) / 7.0
+                    if (positiveRateFromActualDaysWithDataFromLastSeven != null) {
+                        (positiveRateFromActualDaysWithDataFromLastSeven.sumByDouble { it }) / positiveRateFromActualDaysWithDataFromLastSeven.size
                     } else {
                         null
                     }

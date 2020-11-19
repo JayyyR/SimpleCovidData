@@ -56,13 +56,29 @@ data class CovidRawData(
             },
             postiveTestRate =
             positiveIncrease?.let {
-                totalTestResultsIncrease?.let {
-                    if (positiveIncrease == 0L) {
-                        positiveIncrease.toDouble()
+
+                //the data is funky sometimes, we need to work with what we have and throw out anomalies
+                val totalToCalculateAgainst =
+                    if (totalTestResultsIncrease != null && totalTestResultsIncrease > positiveIncrease) { //throw away data where total = positive. It happens and it's garbage data
+                        totalTestResultsIncrease
+                    } else if (negativeIncrease != null && negativeIncrease > 0) {
+                        positiveIncrease + negativeIncrease
                     } else {
-                        (positiveIncrease.toDouble() / (totalTestResultsIncrease)) * 100
+                        null
+                    }
+
+                when {
+                    positiveIncrease == 0L -> {
+                        positiveIncrease.toDouble()
+                    }
+                    totalToCalculateAgainst != null -> {
+                        (positiveIncrease.toDouble() / (totalToCalculateAgainst)) * 100
+                    }
+                    else -> {
+                        null
                     }
                 }
+
             },
             hospitalizedCurrently = hospitalizedCurrently
         )
