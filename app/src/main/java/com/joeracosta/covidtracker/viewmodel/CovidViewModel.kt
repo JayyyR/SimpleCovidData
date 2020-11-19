@@ -58,7 +58,7 @@ class CovidViewModel(
     val dataPlotIndexListener: (Int) -> Unit = { index ->
         when (index) {
             0 -> setDataToPlot(DataToPlot.POSITIVE_CASE_RATE)
-            1 -> setDataToPlot(DataToPlot.NEW_HOSPITALIZATIONS)
+            1 -> setDataToPlot(DataToPlot.CURRENT_HOSPITALIZATIONS)
         }
 
     }
@@ -96,7 +96,7 @@ class CovidViewModel(
     fun getChartTitle(): String {
         return when (currentState.dataToPlot) {
             DataToPlot.POSITIVE_CASE_RATE -> stringGetter.getString(R.string.positive_rate_chart_title)
-            DataToPlot.NEW_HOSPITALIZATIONS -> stringGetter.getString(R.string.new_hospitalizations_chart_title)
+            DataToPlot.CURRENT_HOSPITALIZATIONS -> stringGetter.getString(R.string.current_hospitalizations_chart_title)
             else -> ""
         }
     }
@@ -123,7 +123,16 @@ class CovidViewModel(
     fun getDisclaimerText(): String {
         return when (currentState.dataToPlot) {
             DataToPlot.POSITIVE_CASE_RATE -> ""
-            DataToPlot.NEW_HOSPITALIZATIONS -> stringGetter.getString(R.string.new_hospitalizations_disclaimer)
+            DataToPlot.CURRENT_HOSPITALIZATIONS -> stringGetter.getString(R.string.hospitalizations_disclaimer)
+            else -> ""
+        }
+    }
+
+    @Bindable
+    fun getSubtitleText(): String {
+        return when (currentState.dataToPlot) {
+            DataToPlot.POSITIVE_CASE_RATE -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
+            DataToPlot.CURRENT_HOSPITALIZATIONS -> ""
             else -> ""
         }
     }

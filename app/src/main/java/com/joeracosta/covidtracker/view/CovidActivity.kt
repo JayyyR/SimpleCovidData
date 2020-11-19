@@ -93,7 +93,7 @@ class CovidActivity : AppCompatActivity() {
     private fun setDataPlotSelector(dataToPlot: DataToPlot?) {
         val indexToSelect = when (dataToPlot) {
             DataToPlot.POSITIVE_CASE_RATE -> 0
-            DataToPlot.NEW_HOSPITALIZATIONS -> 1
+            DataToPlot.CURRENT_HOSPITALIZATIONS -> 1
             else -> -1
         }
 
@@ -183,7 +183,7 @@ class CovidActivity : AppCompatActivity() {
 
                 val dataToDisplay = when (dataToPlot) {
                     DataToPlot.POSITIVE_CASE_RATE -> it.postiveTestRateSevenDayAvg?.toFloat()
-                    DataToPlot.NEW_HOSPITALIZATIONS -> it.newHospitalizationsThreeDayAverage?.toFloat()
+                    DataToPlot.CURRENT_HOSPITALIZATIONS -> it.hospitalizedCurrently?.toFloat()
                     else -> null
                 }
 

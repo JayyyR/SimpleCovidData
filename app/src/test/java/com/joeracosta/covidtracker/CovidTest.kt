@@ -38,9 +38,9 @@ class CovidTest {
     @Test
     fun testDataToPlot() {
         covidRobot
-            .setDatToPlot(DataToPlot.NEW_HOSPITALIZATIONS)
-            .assertSelectedDataToPlot(DataToPlot.NEW_HOSPITALIZATIONS)
-            .assertStoredSelectedDataToPlot(DataToPlot.NEW_HOSPITALIZATIONS)
+            .setDatToPlot(DataToPlot.CURRENT_HOSPITALIZATIONS)
+            .assertSelectedDataToPlot(DataToPlot.CURRENT_HOSPITALIZATIONS)
+            .assertStoredSelectedDataToPlot(DataToPlot.CURRENT_HOSPITALIZATIONS)
     }
 
     @Test

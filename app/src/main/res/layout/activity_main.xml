@@ -134,7 +134,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:gravity="center"
-                android:text="@string/chart_subtitle"
+                android:text="@{viewModel.subtitleText}"
                 android:textSize="15sp"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintBottom_toTopOf="@+id/corona_graph"
@@ -182,7 +182,7 @@
                     android:textColor="@drawable/radio_flat_text_selector" />
 
                 <RadioButton
-                    android:id="@+id/new_hospitalizations"
+                    android:id="@+id/current_hospitalizations"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -194,7 +194,7 @@
                     android:maxLines="1"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
-                    android:text="@string/new_hospitalizations"
+                    android:text="@string/current_hospitalizations"
                     android:textColor="@drawable/radio_flat_text_selector" />
 
             </RadioGroup>

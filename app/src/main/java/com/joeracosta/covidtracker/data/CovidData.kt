@@ -21,9 +21,7 @@ data class CovidData(
 
     val postiveTestRateSevenDayAvg: Double? = null,
 
-    val newHospitalizations: Long? = null,
-
-    val newHospitalizationsThreeDayAverage: Double? = null
+    val hospitalizedCurrently: Int? = null
 )
 
 
@@ -44,8 +42,8 @@ data class CovidRawData(
     @SerializedName("totalTestResultsIncrease")
     val totalTestResultsIncrease: Long? = null,
 
-    @SerializedName("hospitalizedIncrease")
-    val hospitalizedIncrease: Long? = null
+    @SerializedName("hospitalizedCurrently")
+    val hospitalizedCurrently: Int? = null
 
 ) {
     @SuppressLint("SimpleDateFormat")
@@ -68,7 +66,7 @@ data class CovidRawData(
                         }
                     }
                 },
-            newHospitalizations = hospitalizedIncrease
+            hospitalizedCurrently = hospitalizedCurrently
         )
     }
 }
