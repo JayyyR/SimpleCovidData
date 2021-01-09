@@ -7,4 +7,7 @@ interface CovidDataApi {
 
     @GET("states/daily.json")
     fun getStateData(): Flowable<List<CovidRawData>>
+
+    @GET("us/daily.json")
+    fun getUSData(): Flowable<List<CovidRawData>>
 }
