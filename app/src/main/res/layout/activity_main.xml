@@ -146,21 +146,21 @@
                 android:id="@+id/corona_graph"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintBottom_toTopOf="@+id/data_to_plot_picker"
+                app:layout_constraintBottom_toTopOf="@+id/covid_data_to_plot_picker"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/chart_subtitle"
                 app:xAxisFormatter="@{viewModel.xAxisFormatter}" />
 
             <RadioGroup
-                android:id="@+id/data_to_plot_picker"
+                android:id="@+id/covid_data_to_plot_picker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="4dp"
                 android:orientation="horizontal"
-                app:radioGroupIndexListener="@{viewModel.dataPlotIndexListener}"
-                app:layout_constraintBottom_toTopOf="@+id/time_frame"
+                app:radioGroupIndexListener="@{viewModel.covidDataPlotIndexListener}"
+                app:layout_constraintBottom_toTopOf="@+id/vaccine_data_to_plot_picker"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/corona_graph">
@@ -199,6 +199,53 @@
 
             </RadioGroup>
 
+            <RadioGroup
+                android:id="@+id/vaccine_data_to_plot_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:checkedButton="@+id/new_vaccinations"
+                android:orientation="horizontal"
+                app:radioGroupIndexListener="@{viewModel.vaccineDataPlotIndexListener}"
+                app:layout_constraintBottom_toTopOf="@+id/time_frame"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/covid_data_to_plot_picker">
+
+                <RadioButton
+                    android:id="@+id/new_vaccinations"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:background="@drawable/radio_flat_selector"
+                    android:button="@android:color/transparent"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/new_vaccinations"
+                    android:textColor="@drawable/radio_flat_text_selector" />
+
+                <RadioButton
+                    android:id="@+id/total_vaccinations"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:background="@drawable/radio_flat_selector"
+                    android:button="@android:color/transparent"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/total_vaccinations"
+                    android:textColor="@drawable/radio_flat_text_selector" />
+
+            </RadioGroup>
+
 
             <RadioGroup
                 android:id="@+id/time_frame"
@@ -211,7 +258,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/state_label"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/data_to_plot_picker">
+                app:layout_constraintTop_toBottomOf="@+id/vaccine_data_to_plot_picker">
 
                 <RadioButton
                     android:id="@+id/all_time"

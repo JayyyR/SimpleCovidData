@@ -19,4 +19,6 @@
     <string name="seven_day_avg">Seven Day Average</string>
     <string name="error_fetching_data">Error Fetching Data</string>
     <string name="hospitalizations_disclaimer">Note: Some states don\'t report hospitalizations. Data may be missing.</string>
+    <string name="new_vaccinations">New Vaccinations</string>
+    <string name="total_vaccinations">Total Vaccinations</string>
 </resources>

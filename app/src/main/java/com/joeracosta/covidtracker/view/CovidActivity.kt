@@ -90,27 +90,42 @@ class CovidActivity : AppCompatActivity() {
 
     private fun setDataPlotSelector(dataToPlot: DataToPlot?) {
         val indexToSelect = when (dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE -> 0
-            DataToPlot.CURRENT_HOSPITALIZATIONS -> 1
+            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.NEW_VACCINATIONS -> 0
+            DataToPlot.CURRENT_HOSPITALIZATIONS, DataToPlot.TOTAL_VACCINATIONS -> 1
             else -> -1
         }
 
+        val groupToUpdate = when (dataToPlot) {
+            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> binding?.covidDataToPlotPicker
+            DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS -> binding?.vaccineDataToPlotPicker
+            else -> null
+        }
+
+        val groupToClear = when (dataToPlot) {
+            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> binding?.vaccineDataToPlotPicker
+            DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS -> binding?.covidDataToPlotPicker
+            else -> null
+        }
+
+
         var currentlySelectedIndex: Int? = null
-        val currentlySelectedRadioButtonId = binding?.dataToPlotPicker?.checkedRadioButtonId
+        val currentlySelectedRadioButtonId = groupToUpdate?.checkedRadioButtonId
         if (currentlySelectedRadioButtonId != null) {
             val currentlySelectedRadioButton =
-                binding?.dataToPlotPicker?.findViewById<RadioButton>(currentlySelectedRadioButtonId)
+                groupToUpdate.findViewById<RadioButton>(currentlySelectedRadioButtonId)
             if (currentlySelectedRadioButton != null) {
                 currentlySelectedIndex =
-                    binding?.dataToPlotPicker?.indexOfChild(currentlySelectedRadioButton)
+                    groupToUpdate.indexOfChild(currentlySelectedRadioButton)
             }
         }
 
         if (indexToSelect != -1 && currentlySelectedIndex != indexToSelect) {
-            (binding?.dataToPlotPicker?.getChildAt(indexToSelect) as RadioButton).isChecked = true
+            (groupToUpdate?.getChildAt(indexToSelect) as RadioButton).isChecked = true
         }
 
-
+        if (groupToClear?.checkedRadioButtonId != -1 && groupToClear?.checkedRadioButtonId != null) {
+            groupToClear.clearCheck()
+        }
     }
 
     private fun setDateSelectorBasedOnTime(amountOfDaysAgoToShow: Int?) {

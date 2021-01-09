@@ -32,7 +32,9 @@ fun RadioGroup.setIndexListener(indexClickedListener: (Int) -> Unit) {
         val radioButton = group.findViewById<RadioButton>(checkedId)
         val index = group.indexOfChild(radioButton)
 
-        indexClickedListener.invoke(index)
+        if (radioButton?.isChecked == true) {
+            indexClickedListener.invoke(index)
+        }
     }
 }
 

@@ -57,12 +57,18 @@ class CovidViewModel(
         }
     }
 
-    val dataPlotIndexListener: (Int) -> Unit = { index ->
+    val covidDataPlotIndexListener: (Int) -> Unit = { index ->
         when (index) {
             0 -> setDataToPlot(DataToPlot.POSITIVE_CASE_RATE)
             1 -> setDataToPlot(DataToPlot.CURRENT_HOSPITALIZATIONS)
         }
+    }
 
+    val vaccineDataPlotIndexListener: (Int) -> Unit = { index ->
+        when (index) {
+            0 -> setDataToPlot(DataToPlot.NEW_VACCINATIONS)
+            1 -> setDataToPlot(DataToPlot.TOTAL_VACCINATIONS)
+        }
     }
 
     val timeFrameIndexListener: (Int) -> Unit = { index ->
