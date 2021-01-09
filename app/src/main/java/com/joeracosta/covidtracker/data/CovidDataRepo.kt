@@ -97,15 +97,19 @@ class CovidDataRepo(
             }
             val dateFormat = SimpleDateFormat("yyyy-MM-dd")
             val date =dateFormat.parse(dateString)
-            val totalVaccinations = valuesArray[totalVaccinationIndex].toLong()
+            val totalVaccinations = valuesArray[totalVaccinationIndex].toLongOrNull()
 
             val previousDaysData = temporaryVaccinationData.lastOrNull()
+
+            val newVaccinations = totalVaccinations?.let {
+                totalVaccinations - (previousDaysData?.totalVaccinationsSoFar ?: 0)
+            } ?: 0
 
             temporaryVaccinationData.add(
                 CovidData(
                     date = date,
                     totalVaccinationsSoFar = totalVaccinations,
-                    newVaccinations = totalVaccinations - (previousDaysData?.totalVaccinationsSoFar ?: 0)
+                    newVaccinations = newVaccinations
                 )
             )
 

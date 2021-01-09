@@ -44,7 +44,8 @@ class CovidActivity : AppCompatActivity() {
                 ourWorldInDataApi = getCovidApp().ourWorldInDataRetrofit.create(OurWorldInDataApi::class.java),
                 covidDataDao = getCovidApp().databaseHelper.covidDb.covidDataDao(),
                 lastUpdatedData = getCovidApp().lastUpdatedData,
-                stringGetter = getCovidApp().stringGetter
+                stringGetter = getCovidApp().stringGetter,
+                appResources = getCovidApp().resources
             ) as T
         }
     }
@@ -211,9 +212,16 @@ class CovidActivity : AppCompatActivity() {
             dataSet.axisDependency = YAxis.AxisDependency.LEFT
 
             dataSet.lineWidth = 3f
-            dataSet.setCircleColor(ContextCompat.getColor(this, R.color.colorAccent))
-            dataSet.circleHoleColor = ContextCompat.getColor(this, R.color.colorAccent)
-            dataSet.color = ContextCompat.getColor(this, R.color.colorAccent)
+
+            val colorIdToUse = when (dataToPlot) {
+                DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> R.color.colorAccent
+                DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS -> R.color.colorAccentBlue
+                else -> R.color.colorAccent
+            }
+
+            dataSet.setCircleColor(ContextCompat.getColor(this, colorIdToUse))
+            dataSet.circleHoleColor = ContextCompat.getColor(this, colorIdToUse)
+            dataSet.color = ContextCompat.getColor(this, colorIdToUse)
             dataSet.setDrawValues(false)
 
 

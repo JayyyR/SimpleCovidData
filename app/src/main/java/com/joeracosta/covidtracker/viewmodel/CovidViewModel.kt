@@ -1,6 +1,10 @@
 package com.joeracosta.covidtracker.viewmodel
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
+import android.content.res.Resources
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.Bindable
 import com.joeracosta.covidtracker.BaseObservableViewModel
 import com.joeracosta.covidtracker.R
@@ -21,7 +25,8 @@ class CovidViewModel(
     private val ourWorldInDataApi: OurWorldInDataApi,
     private val covidDataDao: CovidDataDao,
     private val lastUpdatedData: LastUpdatedData,
-    private val stringGetter: StringGetter
+    private val stringGetter: StringGetter,
+    private val appResources: Resources
 ) : BaseObservableViewModel() {
 
     private val defaultState = CovidState(
@@ -149,6 +154,26 @@ class CovidViewModel(
             DataToPlot.TOTAL_VACCINATIONS -> ""
             else -> ""
         }
+    }
+
+    @Bindable
+    fun getBackgroundForDateRadioButton(): Int {
+        return when (currentState.dataToPlot) {
+            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> R.drawable.radio_flat_selector_red
+            DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS -> R.drawable.radio_flat_selector_blue
+            else -> R.drawable.radio_flat_selector_red
+        }
+    }
+
+    @Bindable
+    fun getTextColorForDateRadioButton(): ColorStateList? {
+        val resourceId = when (currentState.dataToPlot) {
+            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> R.drawable.radio_flat_text_selector_red
+            DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS -> R.drawable.radio_flat_text_selector_blue
+            else -> R.drawable.radio_flat_text_selector_red
+        }
+
+        return ResourcesCompat.getColorStateList(appResources, resourceId, null)
     }
 
     fun refreshData() {

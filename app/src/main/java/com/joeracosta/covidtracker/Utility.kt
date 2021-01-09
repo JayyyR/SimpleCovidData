@@ -1,5 +1,6 @@
 package com.joeracosta.covidtracker
 
+import android.view.View
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.databinding.BindingAdapter
@@ -36,6 +37,11 @@ fun RadioGroup.setIndexListener(indexClickedListener: (Int) -> Unit) {
             indexClickedListener.invoke(index)
         }
     }
+}
+
+@BindingAdapter("backgroundResource")
+fun setBackgroundResource(view: View, backgroundResource: Int) {
+    view.setBackgroundResource(backgroundResource)
 }
 
 object TimeUtil {
