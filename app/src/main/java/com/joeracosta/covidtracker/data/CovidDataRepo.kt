@@ -85,11 +85,16 @@ class CovidDataRepo(
 
         val temporaryVaccinationData = mutableListOf<CovidData>()
 
+        var firstDateOfData: String? = null
+
         var csvLine = bufferedSource.readUtf8Line()
         while (csvLine != null) {
 
             val valuesArray = csvLine.split(Regex(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"))
             val dateString = valuesArray[dateIndex]
+            if (firstDateOfData == null) {
+                firstDateOfData = dateString
+            }
             val dateFormat = SimpleDateFormat("yyyy-MM-dd")
             val date =dateFormat.parse(dateString)
             val totalVaccinations = valuesArray[totalVaccinationIndex].toLong()
@@ -157,7 +162,7 @@ class CovidDataRepo(
 
                 val dayOfFirstVaccinations = Calendar.getInstance()
                     .apply {
-                        set(2020, 11, 20, 0, 0, 0)
+                        set(2020, 11, 14, 0, 0, 0)
                         set(Calendar.MILLISECOND, 0)
                     }
 
@@ -166,7 +171,16 @@ class CovidDataRepo(
 
                 val lastSevenOrLessDaysNewVaccinations = if (daysBetweenCurrentAndFirstDay >= 0 && index >= daysToCalculateVaccineAvgsWith) {
                     list.slice(index - daysToCalculateVaccineAvgsWith..index).map {
-                        it.newVaccinations
+
+                        val newVaccinationsToReturn =
+                            //if united states, return 0 if no data
+                            if (it.location == Location.UNITED_STATES) {
+                                it.newVaccinations ?: 0
+                            } else {
+                                it.newVaccinations
+                            }
+
+                        newVaccinationsToReturn
                     }
                 } else {
                     null
@@ -188,7 +202,7 @@ class CovidDataRepo(
                     }
 
                 val newVaccinationsSevenDayAvg =
-                    if (newVaccinationsFromActualDaysWithDataFromLastSeven != null) {
+                    if (newVaccinationsFromActualDaysWithDataFromLastSeven?.isNotEmpty() == true) {
                         newVaccinationsFromActualDaysWithDataFromLastSeven.sumByDouble { it.toDouble() } / lastSevenOrLessDaysNewVaccinations.size //we calculate avg out of all days even if some days didn't have new vaccinations
                     } else {
                         null

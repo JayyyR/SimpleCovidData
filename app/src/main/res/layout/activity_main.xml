@@ -156,7 +156,7 @@
                 android:id="@+id/covid_data_to_plot_picker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="28dp"
                 android:layout_marginBottom="4dp"
                 android:orientation="horizontal"
                 app:radioGroupIndexListener="@{viewModel.covidDataPlotIndexListener}"

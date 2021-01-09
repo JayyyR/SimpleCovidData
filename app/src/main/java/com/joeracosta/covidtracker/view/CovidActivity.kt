@@ -184,7 +184,6 @@ class CovidActivity : AppCompatActivity() {
     }
 
     private fun plotData(covidDatum: List<CovidData>?, dataToPlot: DataToPlot?) {
-
         if (covidDatum != currentChartedData || currentPlottedDataType != dataToPlot) {
             currentChartedData = covidDatum
             currentPlottedDataType = dataToPlot
@@ -197,6 +196,8 @@ class CovidActivity : AppCompatActivity() {
                 val dataToDisplay = when (dataToPlot) {
                     DataToPlot.POSITIVE_CASE_RATE -> it.postiveTestRateSevenDayAvg?.toFloat()
                     DataToPlot.CURRENT_HOSPITALIZATIONS -> it.hospitalizedCurrently?.toFloat()
+                    DataToPlot.NEW_VACCINATIONS -> it.newVaccinationsSevenDayAvg?.toFloat()
+                    DataToPlot.TOTAL_VACCINATIONS -> it.totalVaccinationsSoFar?.toFloat()
                     else -> null
                 }
 

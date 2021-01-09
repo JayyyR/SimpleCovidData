@@ -105,6 +105,8 @@ class CovidViewModel(
         return when (currentState.dataToPlot) {
             DataToPlot.POSITIVE_CASE_RATE -> stringGetter.getString(R.string.positive_rate_chart_title)
             DataToPlot.CURRENT_HOSPITALIZATIONS -> stringGetter.getString(R.string.current_hospitalizations_chart_title)
+            DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.new_vaccinations_chart_title)
+            DataToPlot.TOTAL_VACCINATIONS -> stringGetter.getString(R.string.total_vaccinations_chart_title)
             else -> ""
         }
     }
@@ -132,6 +134,8 @@ class CovidViewModel(
         return when (currentState.dataToPlot) {
             DataToPlot.POSITIVE_CASE_RATE -> ""
             DataToPlot.CURRENT_HOSPITALIZATIONS -> stringGetter.getString(R.string.hospitalizations_disclaimer)
+            DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.vaccinations_disclaimer)
+            DataToPlot.TOTAL_VACCINATIONS -> stringGetter.getString(R.string.vaccinations_disclaimer)
             else -> ""
         }
     }
@@ -141,6 +145,8 @@ class CovidViewModel(
         return when (currentState.dataToPlot) {
             DataToPlot.POSITIVE_CASE_RATE -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
             DataToPlot.CURRENT_HOSPITALIZATIONS -> ""
+            DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
+            DataToPlot.TOTAL_VACCINATIONS -> ""
             else -> ""
         }
     }
