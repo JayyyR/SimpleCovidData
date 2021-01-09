@@ -319,7 +319,7 @@
                 android:paddingStart="16dp"
                 android:paddingTop="28dp"
                 android:paddingBottom="28dp"
-                android:text="@string/choose_state"
+                android:text="@string/choose_location"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/disclaimer"

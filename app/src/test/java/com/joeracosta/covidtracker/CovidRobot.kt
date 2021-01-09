@@ -1,9 +1,8 @@
 package com.joeracosta.covidtracker
 
 import com.google.common.truth.Truth.assertThat
-import com.joeracosta.covidtracker.data.State
+import com.joeracosta.covidtracker.data.Location
 import com.joeracosta.covidtracker.viewmodel.CovidViewModel
-import com.joeracosta.covidtracker.BaseObservableViewModel
 import com.joeracosta.covidtracker.data.DataToPlot
 
 class CovidRobot {
@@ -18,8 +17,8 @@ class CovidRobot {
     )
 
 
-    fun setSelectedUSState(state: State) = apply {
-        viewModel.setSelectedUSState(state)
+    fun setSelectedUSState(location: Location) = apply {
+        viewModel.setSelectedUSState(location)
     }
 
     fun setSelectedTimeFrame(amountOfDaysAgoToShow: Int) = apply {
@@ -42,12 +41,12 @@ class CovidRobot {
         assertThat(lastUpdatedData.storedDataToPlot).isEqualTo(selectedDataToPlot)
     }
 
-    fun assertSelectedState(selectedState: State) = apply {
-        assertThat(viewModel.stateSubject.value?.selectedUsaState).isEqualTo(selectedState)
+    fun assertSelectedState(selectedLocation: Location) = apply {
+        assertThat(viewModel.stateSubject.value?.selectedUsaLocation).isEqualTo(selectedLocation)
     }
 
-    fun assertSelectedStateIsStored(selectedState: State) = apply {
-        assertThat(lastUpdatedData.storedSelectedUSState).isEqualTo(selectedState)
+    fun assertSelectedStateIsStored(selectedLocation: Location) = apply {
+        assertThat(lastUpdatedData.storedSelectedUSLocation).isEqualTo(selectedLocation)
     }
 
     fun assertAmountOfDaysAgoToShow(amountOfDaysAgoToShow: Int) = apply {

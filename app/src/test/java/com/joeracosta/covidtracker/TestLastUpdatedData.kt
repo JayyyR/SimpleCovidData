@@ -2,12 +2,12 @@ package com.joeracosta.covidtracker
 
 import com.joeracosta.covidtracker.data.DataToPlot
 import com.joeracosta.covidtracker.data.LastUpdatedData
-import com.joeracosta.covidtracker.data.State
+import com.joeracosta.covidtracker.data.Location
 
 class TestLastUpdatedData: LastUpdatedData {
     
     var storedLastUpdatedTime = 0L
-    var storedSelectedUSState: State? = null
+    var storedSelectedUSLocation: Location? = null
     var storedAmountOfDatsAgoToShow: Int? = null
     var storedDataToPlot: DataToPlot? = null
 
@@ -19,12 +19,12 @@ class TestLastUpdatedData: LastUpdatedData {
         storedLastUpdatedTime = lastUpdatedTime
     }
 
-    override fun setSelectedUSState(state: State) {
-        storedSelectedUSState = state
+    override fun setSelectedUSState(location: Location) {
+        storedSelectedUSLocation = location
     }
 
-    override fun getSelectedUSState(): State? {
-        return storedSelectedUSState
+    override fun getSelectedUSState(): Location? {
+        return storedSelectedUSLocation
     }
 
     override fun getAmountOfDaysAgoToShow(): Int? {

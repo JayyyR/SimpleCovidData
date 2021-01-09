@@ -17,14 +17,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CovidViewModel(
-    private val covidDataApi: CovidDataApi,
+    private val covidTrackingProjectApi: CovidTrackingProjectApi,
+    private val ourWorldInDataApi: OurWorldInDataApi,
     private val covidDataDao: CovidDataDao,
     private val lastUpdatedData: LastUpdatedData,
     private val stringGetter: StringGetter
 ) : BaseObservableViewModel() {
 
     private val defaultState = CovidState(
-        selectedUsaState = lastUpdatedData.getSelectedUSState() ?: State.NEW_YORK,
+        selectedUsaLocation = lastUpdatedData.getSelectedUSState() ?: Location.UNITED_STATES,
         amountOfDaysAgoToShow = lastUpdatedData.getAmountOfDaysAgoToShow() ?: ALL_TIME_DAYS,
         dataToPlot = lastUpdatedData.getDataToPlot() ?: DataToPlot.POSITIVE_CASE_RATE
     )
@@ -40,7 +41,8 @@ class CovidViewModel(
         get() = stateSubject.value ?: defaultState
 
     private val covidDataRepo = CovidDataRepo(
-        covidDataApi = covidDataApi,
+        covidTrackingProjectApi = covidTrackingProjectApi,
+        ourWorldInDataApi = ourWorldInDataApi,
         compositeDisposable = compositeDisposable,
         covidDataDao = covidDataDao
     )
@@ -159,7 +161,7 @@ class CovidViewModel(
     }
 
     private fun openConnectionToDBData() {
-        val selectedUsaState = currentState.selectedUsaState
+        val selectedUsaState = currentState.selectedUsaLocation
         val amountOfDaysAgoToShow = currentState.amountOfDaysAgoToShow
 
         val selectedAfterDate = getDateToShowFrom(amountOfDaysAgoToShow)
@@ -171,7 +173,7 @@ class CovidViewModel(
                 selectedAfterDate
             )
                 .subscribe({
-                    currentState.selectedUsaState?.let(lastUpdatedData::setSelectedUSState)
+                    currentState.selectedUsaLocation?.let(lastUpdatedData::setSelectedUSState)
                     updateState(
                         currentState.copy(
                             chartedData = it
@@ -183,12 +185,12 @@ class CovidViewModel(
         }
     }
 
-    fun setSelectedUSState(selectedUSAState: State) {
-        if (selectedUSAState == currentState.selectedUsaState) return
+    fun setSelectedUSState(selectedUSALocation: Location) {
+        if (selectedUSALocation == currentState.selectedUsaLocation) return
 
         updateState(
             currentState.copy(
-                selectedUsaState = selectedUSAState
+                selectedUsaLocation = selectedUSALocation
             )
         )
     }
@@ -213,7 +215,7 @@ class CovidViewModel(
 
     private fun updateState(newCovidState: CovidState) {
 
-        val stateSelectedBefore = currentState.selectedUsaState
+        val stateSelectedBefore = currentState.selectedUsaLocation
         val amountOfDaysAgoToShow = currentState.amountOfDaysAgoToShow
         stateSubject.onNext(
             newCovidState
@@ -222,7 +224,7 @@ class CovidViewModel(
         notifyChange()
 
         //only check if data is new
-        if (stateSelectedBefore != currentState.selectedUsaState || amountOfDaysAgoToShow != currentState.amountOfDaysAgoToShow) {
+        if (stateSelectedBefore != currentState.selectedUsaLocation || amountOfDaysAgoToShow != currentState.amountOfDaysAgoToShow) {
             openConnectionToDBData()
         }
     }

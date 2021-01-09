@@ -1,7 +1,7 @@
 package com.joeracosta.covidtracker
 
 import com.joeracosta.covidtracker.data.DataToPlot
-import com.joeracosta.covidtracker.data.State
+import com.joeracosta.covidtracker.data.Location
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
@@ -22,9 +22,9 @@ class CovidTest {
     @Test
     fun testUSState() {
         covidRobot
-            .setSelectedUSState(State.NEW_JERSEY)
-            .assertSelectedState(State.NEW_JERSEY)
-            .assertSelectedStateIsStored(State.NEW_JERSEY)
+            .setSelectedUSState(Location.NEW_JERSEY)
+            .assertSelectedState(Location.NEW_JERSEY)
+            .assertSelectedStateIsStored(Location.NEW_JERSEY)
     }
 
     @Test

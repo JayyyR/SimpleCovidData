@@ -1,7 +1,7 @@
 package com.joeracosta.covidtracker
 
 import com.joeracosta.covidtracker.data.CovidData
-import com.joeracosta.covidtracker.data.State
+import com.joeracosta.covidtracker.data.Location
 import com.joeracosta.covidtracker.data.db.CovidDataDao
 import io.reactivex.Flowable
 import java.util.*
@@ -13,7 +13,7 @@ class TestCovidDao: CovidDataDao {
     ): Flowable<List<CovidData>> {
        return Flowable.fromCallable {
            listOf(CovidData(
-               state = State.values().find { it.postalCode == state }
+               location = Location.values().find { it.postalCode == state }
            ))
        }
     }

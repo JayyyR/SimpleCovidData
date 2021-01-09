@@ -3,7 +3,7 @@ package com.joeracosta.covidtracker.data.db
 import android.content.Context
 import androidx.room.*
 import com.joeracosta.covidtracker.data.CovidData
-import com.joeracosta.covidtracker.data.State
+import com.joeracosta.covidtracker.data.Location
 import java.util.*
 
 class DatabaseHelper(val appContext: Context){
@@ -21,7 +21,7 @@ class DatabaseHelper(val appContext: Context){
 
 @Database(
     entities = [CovidData::class],
-    version = 3
+    version = 4
 )
 @TypeConverters(value = [Converters::class])
 abstract class CovidDatabase: RoomDatabase() {
@@ -40,13 +40,13 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromState(value: State?): String? {
+    fun fromState(value: Location?): String? {
         return value?.postalCode
     }
 
     @TypeConverter
-    fun toState(postalCode: String?): State? {
-        return enumValues<State>().find {
+    fun toState(postalCode: String?): Location? {
+        return enumValues<Location>().find {
             it.postalCode == postalCode
         }
     }

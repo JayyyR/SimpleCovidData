@@ -13,7 +13,7 @@ data class CovidData(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    val state: State? = null,
+    val location: Location? = null,
 
     val date: Date? = null,
 
@@ -21,14 +21,20 @@ data class CovidData(
 
     val postiveTestRateSevenDayAvg: Double? = null,
 
-    val hospitalizedCurrently: Int? = null
+    val hospitalizedCurrently: Int? = null,
+
+    val newVaccinations: Long? = null,
+
+    val newVaccinationsSevenDayAvg: Double? = null,
+
+    val totalVaccinationsSoFar: Long? = null
 )
 
 
 data class CovidRawData(
 
     @SerializedName("state")
-    val state: State? = null,
+    val location: Location? = null,
 
     @SerializedName("date")
     val date: String? = null,
@@ -49,7 +55,7 @@ data class CovidRawData(
     @SuppressLint("SimpleDateFormat")
     fun toCovidData(): CovidData {
         return CovidData(
-            state = state,
+            location = location,
             date = date?.let {
                 val dateFormat = SimpleDateFormat("yyyyMMdd")
                 dateFormat.parse(it)

@@ -20,10 +20,7 @@ import com.joeracosta.covidtracker.CovidApp
 import com.joeracosta.covidtracker.R
 import com.joeracosta.covidtracker.TimeUtil
 import com.joeracosta.covidtracker.addToComposite
-import com.joeracosta.covidtracker.data.CovidData
-import com.joeracosta.covidtracker.data.CovidDataApi
-import com.joeracosta.covidtracker.data.DataToPlot
-import com.joeracosta.covidtracker.data.State
+import com.joeracosta.covidtracker.data.*
 import com.joeracosta.covidtracker.databinding.ActivityMainBinding
 import com.joeracosta.covidtracker.viewmodel.CovidViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -43,7 +40,8 @@ class CovidActivity : AppCompatActivity() {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return CovidViewModel(
-                covidDataApi = getCovidApp().retrofit.create(CovidDataApi::class.java),
+                covidTrackingProjectApi = getCovidApp().covidTrackingRetrofit.create(CovidTrackingProjectApi::class.java),
+                ourWorldInDataApi = getCovidApp().ourWorldInDataRetrofit.create(OurWorldInDataApi::class.java),
                 covidDataDao = getCovidApp().databaseHelper.covidDb.covidDataDao(),
                 lastUpdatedData = getCovidApp().lastUpdatedData,
                 stringGetter = getCovidApp().stringGetter
@@ -77,8 +75,8 @@ class CovidActivity : AppCompatActivity() {
 
                 val currentSelectedUSState = binding?.stateSpinner?.selectedItem
 
-                if (currentSelectedUSState != it.selectedUsaState) {
-                    val position = State.values().indexOf(it.selectedUsaState)
+                if (currentSelectedUSState != it.selectedUsaLocation) {
+                    val position = Location.values().indexOf(it.selectedUsaLocation)
                     binding?.stateSpinner?.setSelection(position)
                 }
 
@@ -150,7 +148,7 @@ class CovidActivity : AppCompatActivity() {
     private fun configureSpinner() {
 
         binding?.stateSpinner?.adapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, State.values())
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, Location.values())
 
         binding?.stateSpinner?.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
@@ -162,7 +160,7 @@ class CovidActivity : AppCompatActivity() {
                     position: Int,
                     id: Long
                 ) {
-                    State.values().getOrNull(position)?.let {
+                    Location.values().getOrNull(position)?.let {
                         viewModel?.setSelectedUSState(it)
                     }
                 }

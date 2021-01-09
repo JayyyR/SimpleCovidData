@@ -1,13 +1,11 @@
 package com.joeracosta.covidtracker.data
 
 import io.reactivex.Flowable
+import okhttp3.ResponseBody
 import retrofit2.http.GET
 
-interface CovidDataApi {
+interface OurWorldInDataApi {
 
-    @GET("states/daily.json")
-    fun getStateData(): Flowable<List<CovidRawData>>
-
-    @GET("us/daily.json")
-    fun getUSData(): Flowable<List<CovidRawData>>
+    @GET("data/vaccinations/country_data/United%20States.csv")
+    fun vaccinationData(): Flowable<ResponseBody>
 }

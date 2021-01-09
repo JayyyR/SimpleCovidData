@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 interface LastUpdatedData {
     fun getLastUpdatedTime(): Long
     fun setLastUpdatedTime(lastUpdatedTime: Long)
-    fun setSelectedUSState(state: State)
-    fun getSelectedUSState(): State?
+    fun setSelectedUSState(location: Location)
+    fun getSelectedUSState(): Location?
     fun getAmountOfDaysAgoToShow(): Int?
     fun setAmountOfDaysAgoToShow(fromDate: Int)
     fun getDataToPlot(): DataToPlot?
@@ -25,13 +25,13 @@ class LastUpdatedDataConcrete(
         sharedPreferences.edit().putLong(LAST_UPDATED_TIME, lastUpdatedTime).apply()
     }
 
-    override fun setSelectedUSState(state: State) {
-        sharedPreferences.edit().putString(SELECTED_STATE, state.postalCode).apply()
+    override fun setSelectedUSState(location: Location) {
+        sharedPreferences.edit().putString(SELECTED_STATE, location.postalCode).apply()
     }
 
-    override fun getSelectedUSState(): State? {
+    override fun getSelectedUSState(): Location? {
         val postalCode = sharedPreferences.getString(SELECTED_STATE, "")
-        return State.values().find { it.postalCode == postalCode }
+        return Location.values().find { it.postalCode == postalCode }
     }
 
     override fun getAmountOfDaysAgoToShow(): Int? {

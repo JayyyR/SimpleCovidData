@@ -3,7 +3,7 @@
     <string name="updating">Updating&#8230;</string>
     <string name="refresh_data">REFRESH DATA</string>
     <string name="never_updated">Never Updated</string>
-    <string name="choose_state">Choose a state:</string>
+    <string name="choose_location">Choose location:</string>
     <string name="positive_rate_chart_title">Percentage of Tests with a Positive Result</string>
     <string name="current_hospitalizations_chart_title">Current Hospitalizations</string>
     <string name="chart_subtitle_seven_day_avg">(7-Day Avg)</string>

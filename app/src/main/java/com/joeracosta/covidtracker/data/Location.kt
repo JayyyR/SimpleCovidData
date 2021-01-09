@@ -2,7 +2,11 @@ package com.joeracosta.covidtracker.data
 
 import com.google.gson.annotations.SerializedName
 
-enum class State(val postalCode: String) {
+enum class Location(val postalCode: String) {
+
+    @SerializedName("US")
+    UNITED_STATES("US"),
+
     @SerializedName("AL")
     ALABAMA("AL"),
 
