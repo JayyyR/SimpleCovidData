@@ -170,13 +170,25 @@ class CovidViewModel(
     fun getChartEntriesFromDatum(covidDatum: List<CovidData>?, dataToPlot: DataToPlot?): List<Entry> {
 
         val entries = arrayListOf<Entry>()
-        covidDatum?.forEach {
+        val latestDayWithVaccinationTotals = covidDatum?.findLast { it.totalVaccinationsSoFar != null }
+        val latestDayWithVaccinationTotalsIndexRaw = covidDatum?.indexOf(latestDayWithVaccinationTotals)
+
+        val latestDayWithVaccinationTotalsIndex = if (latestDayWithVaccinationTotalsIndexRaw == -1 || latestDayWithVaccinationTotalsIndexRaw == null) Int.MAX_VALUE else latestDayWithVaccinationTotalsIndexRaw
+
+        covidDatum?.forEachIndexed { index, it ->
             val dateFloat = it.date?.time?.toFloat()
 
             val dataToDisplay = when (dataToPlot) {
                 DataToPlot.POSITIVE_CASE_RATE -> it.postiveTestRateSevenDayAvg?.toFloat()
                 DataToPlot.CURRENT_HOSPITALIZATIONS -> it.hospitalizedCurrently?.toFloat()
-                DataToPlot.NEW_VACCINATIONS -> it.newVaccinationsSevenDayAvg?.toFloat()
+                DataToPlot.NEW_VACCINATIONS -> {
+                    //don't plot days we don't have data for yet
+                    if (index > latestDayWithVaccinationTotalsIndex) {
+                        null
+                    } else {
+                        it.newVaccinationsSevenDayAvg?.toFloat()
+                    }
+                }
                 DataToPlot.TOTAL_VACCINATIONS -> it.totalVaccinationsSoFar?.toFloat()
                 else -> null
             }
@@ -185,6 +197,7 @@ class CovidViewModel(
                 entries.add(Entry(dateFloat, dataToDisplay))
             }
         }
+
         return entries
     }
 
