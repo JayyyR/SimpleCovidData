@@ -1,19 +1,23 @@
 package com.joeracosta.covidtracker
 
+import android.content.res.Resources
 import com.google.common.truth.Truth.assertThat
 import com.joeracosta.covidtracker.data.Location
 import com.joeracosta.covidtracker.viewmodel.CovidViewModel
 import com.joeracosta.covidtracker.data.DataToPlot
+import org.mockito.Mockito
 
 class CovidRobot {
 
     private val lastUpdatedData = TestLastUpdatedData()
 
     private var viewModel = CovidViewModel(
-        covidDataApi = TestCovidApi(),
+        covidTrackingProjectApi = TestCovidApi(),
+        ourWorldInDataApi = TestOurWorldInDataApi(),
         covidDataDao = TestCovidDao(),
         lastUpdatedData = lastUpdatedData,
-        stringGetter = TestStringGetter()
+        stringGetter = TestStringGetter(),
+        appResources = Mockito.mock(Resources::class.java)
     )
 
 
