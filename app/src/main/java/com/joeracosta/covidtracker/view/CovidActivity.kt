@@ -189,23 +189,7 @@ class CovidActivity : AppCompatActivity() {
             currentChartedData = covidDatum
             currentPlottedDataType = dataToPlot
 
-            val entries = arrayListOf<Entry>()
-            covidDatum?.forEach {
-
-                val dateFloat = it.date?.time?.toFloat()
-
-                val dataToDisplay = when (dataToPlot) {
-                    DataToPlot.POSITIVE_CASE_RATE -> it.postiveTestRateSevenDayAvg?.toFloat()
-                    DataToPlot.CURRENT_HOSPITALIZATIONS -> it.hospitalizedCurrently?.toFloat()
-                    DataToPlot.NEW_VACCINATIONS -> it.newVaccinationsSevenDayAvg?.toFloat()
-                    DataToPlot.TOTAL_VACCINATIONS -> it.totalVaccinationsSoFar?.toFloat()
-                    else -> null
-                }
-
-                if (dateFloat != null && dataToDisplay != null) {
-                    entries.add(Entry(dateFloat, dataToDisplay))
-                }
-            }
+            val entries = viewModel?.getChartEntriesFromDatum(covidDatum, dataToPlot)
 
             val dataSet = LineDataSet(entries, "")
 

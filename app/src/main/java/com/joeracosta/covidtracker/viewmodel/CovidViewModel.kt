@@ -3,9 +3,11 @@ package com.joeracosta.covidtracker.viewmodel
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.content.res.Resources
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.Bindable
+import com.github.mikephil.charting.data.Entry
 import com.joeracosta.covidtracker.BaseObservableViewModel
 import com.joeracosta.covidtracker.R
 import com.joeracosta.covidtracker.TimeUtil
@@ -163,6 +165,39 @@ class CovidViewModel(
             DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS -> R.drawable.radio_flat_selector_blue
             else -> R.drawable.radio_flat_selector_red
         }
+    }
+
+    fun getChartEntriesFromDatum(covidDatum: List<CovidData>?, dataToPlot: DataToPlot?): List<Entry> {
+
+        val entries = arrayListOf<Entry>()
+        covidDatum?.forEach {
+            val dateFloat = it.date?.time?.toFloat()
+
+            val dataToDisplay = when (dataToPlot) {
+                DataToPlot.POSITIVE_CASE_RATE -> it.postiveTestRateSevenDayAvg?.toFloat()
+                DataToPlot.CURRENT_HOSPITALIZATIONS -> it.hospitalizedCurrently?.toFloat()
+                DataToPlot.NEW_VACCINATIONS -> it.newVaccinationsSevenDayAvg?.toFloat()
+                DataToPlot.TOTAL_VACCINATIONS -> it.totalVaccinationsSoFar?.toFloat()
+                else -> null
+            }
+
+            if (dateFloat != null && dataToDisplay != null) {
+                entries.add(Entry(dateFloat, dataToDisplay))
+            }
+        }
+        return entries
+    }
+
+    @Bindable
+    fun getChartVisibility(): Int {
+        val entriesToShow = getChartEntriesFromDatum(currentState.chartedData, currentState.dataToPlot)
+        return if (entriesToShow.isEmpty()) View.INVISIBLE else View.VISIBLE
+    }
+
+    @Bindable
+    fun getNoDataVisibility(): Int {
+        val entriesToShow = getChartEntriesFromDatum(currentState.chartedData, currentState.dataToPlot)
+        return if (entriesToShow.isEmpty()) View.VISIBLE else View.GONE
     }
 
     @Bindable

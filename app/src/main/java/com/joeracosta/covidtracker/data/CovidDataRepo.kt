@@ -85,19 +85,17 @@ class CovidDataRepo(
 
         val temporaryVaccinationData = mutableListOf<CovidData>()
 
-        var firstDateOfData: String? = null
-
         var csvLine = bufferedSource.readUtf8Line()
         while (csvLine != null) {
 
             val valuesArray = csvLine.split(Regex(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"))
-            val dateString = valuesArray[dateIndex]
-            if (firstDateOfData == null) {
-                firstDateOfData = dateString
-            }
+            val dateString = valuesArray.getOrNull(dateIndex)
+
             val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-            val date =dateFormat.parse(dateString)
-            val totalVaccinations = valuesArray[totalVaccinationIndex].toLongOrNull()
+            val date = dateString?.let {
+                dateFormat.parse(dateString)
+            }
+            val totalVaccinations = valuesArray.getOrNull(totalVaccinationIndex)?.toLongOrNull()
 
             val previousDaysData = temporaryVaccinationData.lastOrNull()
 
@@ -105,13 +103,15 @@ class CovidDataRepo(
                 totalVaccinations - (previousDaysData?.totalVaccinationsSoFar ?: 0)
             } ?: 0
 
-            temporaryVaccinationData.add(
-                CovidData(
-                    date = date,
-                    totalVaccinationsSoFar = totalVaccinations,
-                    newVaccinations = newVaccinations
+            if (date != null) {
+                temporaryVaccinationData.add(
+                    CovidData(
+                        date = date,
+                        totalVaccinationsSoFar = totalVaccinations,
+                        newVaccinations = newVaccinations
+                    )
                 )
-            )
+            }
 
             csvLine = bufferedSource.readUtf8Line()
         }
