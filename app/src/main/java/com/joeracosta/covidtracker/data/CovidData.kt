@@ -23,11 +23,11 @@ data class CovidData(
 
     val hospitalizedCurrently: Int? = null,
 
-    val newVaccinations: Long? = null,
+    val newPeopleVaccinated: Long? = null,
 
     val newVaccinationsSevenDayAvg: Double? = null,
 
-    val totalVaccinationsSoFar: Long? = null
+    val totalPeopleVaccinated: Long? = null
 )
 
 

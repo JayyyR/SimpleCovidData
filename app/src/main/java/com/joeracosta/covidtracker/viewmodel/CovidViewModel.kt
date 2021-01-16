@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.Bindable
 import com.github.mikephil.charting.data.Entry
@@ -170,7 +169,7 @@ class CovidViewModel(
     fun getChartEntriesFromDatum(covidDatum: List<CovidData>?, dataToPlot: DataToPlot?): List<Entry> {
 
         val entries = arrayListOf<Entry>()
-        val latestDayWithVaccinationTotals = covidDatum?.findLast { it.totalVaccinationsSoFar != null }
+        val latestDayWithVaccinationTotals = covidDatum?.findLast { it.totalPeopleVaccinated != null }
         val latestDayWithVaccinationTotalsIndexRaw = covidDatum?.indexOf(latestDayWithVaccinationTotals)
 
         val latestDayWithVaccinationTotalsIndex = if (latestDayWithVaccinationTotalsIndexRaw == -1 || latestDayWithVaccinationTotalsIndexRaw == null) Int.MAX_VALUE else latestDayWithVaccinationTotalsIndexRaw
@@ -189,7 +188,7 @@ class CovidViewModel(
                         it.newVaccinationsSevenDayAvg?.toFloat()
                     }
                 }
-                DataToPlot.TOTAL_VACCINATIONS -> it.totalVaccinationsSoFar?.toFloat()
+                DataToPlot.TOTAL_VACCINATIONS -> it.totalPeopleVaccinated?.toFloat()
                 else -> null
             }
 

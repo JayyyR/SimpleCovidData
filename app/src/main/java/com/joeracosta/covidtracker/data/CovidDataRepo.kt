@@ -8,7 +8,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Function3
+import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import okhttp3.ResponseBody
@@ -33,30 +33,39 @@ class CovidDataRepo(
         Flowable.zip(
             covidTrackingProjectApi.getStateData(),
             covidTrackingProjectApi.getUSData(),
-            ourWorldInDataApi.vaccinationData(),
-            Function3 { stateData: List<CovidRawData>, usData: List<CovidRawData>, vaccinationDataResponse: ResponseBody ->
+            ourWorldInDataApi.vaccinationUSData(),
+            ourWorldInDataApi.vaccinationStateData(),
+            Function4 { stateData: List<CovidRawData>,
+                        usData: List<CovidRawData>,
+                        usVaccinationResponse: ResponseBody,
+                        stateVaccinationResponse: ResponseBody ->
 
                 val usDataWithVaccinations = addVaccinations(
-                    vaccinationDataResponse,
-                    usData =  usData.map {
+                    rawVaccineResponse = usVaccinationResponse,
+                    covidData = usData.map {
                         it.copy(
                             location = Location.UNITED_STATES
                         ).toCovidData()
-                    }
+                    },
+                    isCountryData = true
+                )
+
+                val stateDataWithVaccinations = addVaccinations(
+                    rawVaccineResponse = stateVaccinationResponse,
+                    covidData = stateData.map { it.toCovidData() },
+                    isCountryData = false
                 )
 
                 //combine state data with US Data
                 listOf(
-                    stateData.map {
-                        it.toCovidData()
-                    },
+                    stateDataWithVaccinations,
                     usDataWithVaccinations
                 ).flatten()
 
             })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ covidData ->
+            .subscribe({ covidData: List<CovidData> ->
 
                 val dataWithSevenDayAverages = calculateSevenDayAverages(covidData)
 
@@ -74,14 +83,20 @@ class CovidDataRepo(
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun addVaccinations(rawVaccineResponse: ResponseBody, usData: List<CovidData>): List<CovidData> {
+    private fun addVaccinations(
+        rawVaccineResponse: ResponseBody,
+        covidData: List<CovidData>,
+        isCountryData: Boolean
+    ): List<CovidData> {
         val bufferedSource = rawVaccineResponse.source()
 
         val header = bufferedSource.readUtf8Line()
         val headerTitles = header?.split(Regex(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"))
 
-        val dateIndex = headerTitles?.indexOf(VACCINE_DATA_DATE_HEADER_TITLE) ?: return usData
-        val totalVaccinationIndex = headerTitles.indexOf(VACCINE_DATA_TOTAL_VACCINATIONS_HEADER_TITLE)
+        val dateIndex = headerTitles?.indexOf(VACCINE_DATA_DATE_HEADER_TITLE) ?: return covidData
+        val totalPeopleVaccinatedIndex =
+            headerTitles.indexOf(VACCINE_DATA_TOTAL_PEOPLE_VACCINATED_HEADER_TITLE)
+        val locationIndex = headerTitles.indexOf(VACCINE_DATA_LOCATION_HEADER_TITLE)
 
         val temporaryVaccinationData = mutableListOf<CovidData>()
 
@@ -95,20 +110,23 @@ class CovidDataRepo(
             val date = dateString?.let {
                 dateFormat.parse(dateString)
             }
-            val totalVaccinations = valuesArray.getOrNull(totalVaccinationIndex)?.toLongOrNull()
+            val locationString = if (isCountryData) Location.UNITED_STATES.toString() else valuesArray.getOrNull(locationIndex)
+            val peopleVaccinated = valuesArray.getOrNull(totalPeopleVaccinatedIndex)?.toDoubleOrNull()
 
             val previousDaysData = temporaryVaccinationData.lastOrNull()
 
-            val newVaccinations = totalVaccinations?.let {
-                totalVaccinations - (previousDaysData?.totalVaccinationsSoFar ?: 0)
-            } ?: 0
+            val newVaccinations = peopleVaccinated?.let {
+                peopleVaccinated - (previousDaysData?.totalPeopleVaccinated ?: 0)
+            } ?: 0.0
 
-            if (date != null) {
+            val location = Location.getLocationFromString(locationString)
+            if (date != null && location != null) {
                 temporaryVaccinationData.add(
                     CovidData(
                         date = date,
-                        totalVaccinationsSoFar = totalVaccinations,
-                        newVaccinations = newVaccinations
+                        location = location,
+                        totalPeopleVaccinated = peopleVaccinated?.toLong(),
+                        newPeopleVaccinated = newVaccinations.toLong()
                     )
                 )
             }
@@ -117,17 +135,18 @@ class CovidDataRepo(
         }
 
         //combine data
-        return usData.map { usCovidData ->
+        return covidData.map { dataWithoutVaccinations ->
 
-            val matchingVaccinationData = temporaryVaccinationData.find { it.date == usCovidData.date }
+            val matchingVaccinationData =
+                temporaryVaccinationData.find { it.date == dataWithoutVaccinations.date && it.location == dataWithoutVaccinations.location }
             if (matchingVaccinationData != null) {
-                return@map usCovidData.copy(
-                    totalVaccinationsSoFar = matchingVaccinationData.totalVaccinationsSoFar,
-                    newVaccinations = matchingVaccinationData.newVaccinations
+                return@map dataWithoutVaccinations.copy(
+                    totalPeopleVaccinated = matchingVaccinationData.totalPeopleVaccinated,
+                    newPeopleVaccinated = matchingVaccinationData.newPeopleVaccinated
                 )
             }
 
-            return@map usCovidData
+            return@map dataWithoutVaccinations
         }
     }
 
@@ -170,25 +189,30 @@ class CovidDataRepo(
                         set(Calendar.MILLISECOND, 0)
                     }
 
-                val daysBetweenCurrentAndFirstDay = daysBetween(dayOfFirstVaccinations.time, covidData.date)
-                val daysToCalculateVaccineAvgsWith = minOf(daysBetweenCurrentAndFirstDay, 6) //calculate last 7 days or only days since vaccination startedd
+                val daysBetweenCurrentAndFirstDay =
+                    daysBetween(dayOfFirstVaccinations.time, covidData.date)
+                val daysToCalculateVaccineAvgsWith = minOf(
+                    daysBetweenCurrentAndFirstDay,
+                    6
+                ) //calculate last 7 days or only days since vaccination startedd
 
-                val lastSevenOrLessDaysNewVaccinations = if (daysBetweenCurrentAndFirstDay >= 0 && index >= daysToCalculateVaccineAvgsWith) {
-                    list.slice(index - daysToCalculateVaccineAvgsWith..index).map {
+                val lastSevenOrLessDaysNewVaccinations =
+                    if (daysBetweenCurrentAndFirstDay >= 0 && index >= daysToCalculateVaccineAvgsWith) {
+                        list.slice(index - daysToCalculateVaccineAvgsWith..index).map {
 
-                        val newVaccinationsToReturn =
-                            //if united states, return 0 if no data
-                            if (it.location == Location.UNITED_STATES) {
-                                it.newVaccinations ?: 0
-                            } else {
-                                it.newVaccinations
-                            }
+                            val newVaccinationsToReturn =
+                                //if united states, return 0 if no data
+                                if (it.location == Location.UNITED_STATES) {
+                                    it.newPeopleVaccinated ?: 0
+                                } else {
+                                    it.newPeopleVaccinated
+                                }
 
-                        newVaccinationsToReturn
+                            newVaccinationsToReturn
+                        }
+                    } else {
+                        null
                     }
-                } else {
-                    null
-                }
 
                 //sometimes days have null data because of garabage from the API but we still want to calculate averages from the data we have
                 val positiveRateFromActualDaysWithDataFromLastSeven =
@@ -256,9 +280,11 @@ class CovidDataRepo(
         val difference = ((d2.time - d1.time) / (1000 * 60 * 60 * 24)).toInt()
         return difference
     }
+
     companion object {
         const val VACCINE_DATA_DATE_HEADER_TITLE = "date"
-        const val VACCINE_DATA_TOTAL_VACCINATIONS_HEADER_TITLE = "total_vaccinations"
+        const val VACCINE_DATA_TOTAL_PEOPLE_VACCINATED_HEADER_TITLE = "people_vaccinated"
+        const val VACCINE_DATA_LOCATION_HEADER_TITLE = "location"
     }
 
 }

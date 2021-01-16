@@ -41,7 +41,7 @@ class CovidApp: Application() {
 
     val ourWorldInDataRetrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://raw.githubusercontent.com/owid/covid-19-data/master/public/")
+            .baseUrl("https://covid.ourworldindata.org/data/vaccinations/")
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(OkHttpClient.Builder().build())
             .build()

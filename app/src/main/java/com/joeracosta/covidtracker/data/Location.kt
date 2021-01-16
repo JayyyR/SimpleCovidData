@@ -163,4 +163,21 @@ enum class Location(val postalCode: String) {
     override fun toString(): String {
         return super.toString().replace("_", " ")
     }
+
+    companion object {
+        fun getLocationFromString(locationString: String?): Location? {
+            if (locationString == null) return null
+
+            //special case
+            if (locationString.equals("New York State", ignoreCase = true)) return NEW_YORK
+
+            values().forEach {
+                if (it.toString().equals(locationString, true)) {
+                        return it
+                    }
+            }
+
+            return null
+        }
+    }
 }

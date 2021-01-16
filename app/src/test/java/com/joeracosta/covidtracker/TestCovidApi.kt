@@ -26,7 +26,7 @@ class TestCovidApi: CovidTrackingProjectApi {
 }
 
 class TestOurWorldInDataApi: OurWorldInDataApi {
-    override fun vaccinationData(): Flowable<ResponseBody> {
+    override fun vaccinationUSData(): Flowable<ResponseBody> {
         val test = BehaviorSubject.create<ResponseBody>()
         test.onNext(ResponseBody.create(
             MediaType.parse("application/json"),
