@@ -74,6 +74,7 @@ class CovidViewModel(
         when (index) {
             0 -> setDataToPlot(DataToPlot.NEW_VACCINATIONS)
             1 -> setDataToPlot(DataToPlot.TOTAL_VACCINATIONS)
+            2 -> setDataToPlot(DataToPlot.PERCENT_VACCINATED)
         }
     }
 
@@ -113,6 +114,7 @@ class CovidViewModel(
             DataToPlot.CURRENT_HOSPITALIZATIONS -> stringGetter.getString(R.string.current_hospitalizations_chart_title)
             DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.new_vaccinations_chart_title)
             DataToPlot.TOTAL_VACCINATIONS -> stringGetter.getString(R.string.total_vaccinations_chart_title)
+            DataToPlot.PERCENT_VACCINATED -> stringGetter.getString(R.string.percent_vaccinated_chart_title)
             else -> ""
         }
     }
@@ -138,10 +140,7 @@ class CovidViewModel(
     @Bindable
     fun getDisclaimerText(): String {
         return when (currentState.dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE -> ""
             DataToPlot.CURRENT_HOSPITALIZATIONS -> stringGetter.getString(R.string.hospitalizations_disclaimer)
-            DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.vaccinations_disclaimer)
-            DataToPlot.TOTAL_VACCINATIONS -> stringGetter.getString(R.string.vaccinations_disclaimer)
             else -> ""
         }
     }
@@ -149,10 +148,7 @@ class CovidViewModel(
     @Bindable
     fun getSubtitleText(): String {
         return when (currentState.dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
-            DataToPlot.CURRENT_HOSPITALIZATIONS -> ""
-            DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
-            DataToPlot.TOTAL_VACCINATIONS -> ""
+            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
             else -> ""
         }
     }
@@ -161,7 +157,7 @@ class CovidViewModel(
     fun getBackgroundForDateRadioButton(): Int {
         return when (currentState.dataToPlot) {
             DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> R.drawable.radio_flat_selector_red
-            DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS -> R.drawable.radio_flat_selector_blue
+            DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS, DataToPlot.PERCENT_VACCINATED -> R.drawable.radio_flat_selector_blue
             else -> R.drawable.radio_flat_selector_red
         }
     }
@@ -189,6 +185,7 @@ class CovidViewModel(
                     }
                 }
                 DataToPlot.TOTAL_VACCINATIONS -> it.totalPeopleVaccinated?.toFloat()
+                DataToPlot.PERCENT_VACCINATED -> it.percentOfPopulationVaccinated?.toFloat()
                 else -> null
             }
 
@@ -216,7 +213,7 @@ class CovidViewModel(
     fun getTextColorForDateRadioButton(): ColorStateList? {
         val resourceId = when (currentState.dataToPlot) {
             DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> R.drawable.radio_flat_text_selector_red
-            DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS -> R.drawable.radio_flat_text_selector_blue
+            DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS, DataToPlot.PERCENT_VACCINATED -> R.drawable.radio_flat_text_selector_blue
             else -> R.drawable.radio_flat_text_selector_red
         }
 

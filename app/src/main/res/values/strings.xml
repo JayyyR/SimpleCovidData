@@ -21,8 +21,10 @@
     <string name="hospitalizations_disclaimer">Note: Some states don\'t report hospitalizations. Data may be missing.</string>
     <string name="new_vaccinations">New Vaccinations</string>
     <string name="total_vaccinations">Total Vaccinations</string>
+    <string name="percent_vaccinated">% Vaccinated</string>
     <string name="new_vaccinations_chart_title">"Daily New People Vaccinated"</string>
     <string name="total_vaccinations_chart_title">Total People Vaccinated</string>
+    <string name="percent_vaccinated_chart_title">Percent of Population Vaccinated</string>
     <string name="vaccinations_disclaimer">Note: Vaccination data is only currently available for the United States. Not at a state by state level.</string>
     <string name="chart_data_unavailable">No data to show</string>
 </resources>

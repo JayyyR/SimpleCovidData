@@ -96,9 +96,10 @@ class CovidDataRepo(
         val dateIndex = headerTitles?.indexOf(VACCINE_DATA_DATE_HEADER_TITLE) ?: return covidData
         val totalPeopleVaccinatedIndex =
             headerTitles.indexOf(VACCINE_DATA_TOTAL_PEOPLE_VACCINATED_HEADER_TITLE)
+        val percentVaccinatedIndex = headerTitles.indexOf(VACCINE_DATA_PEOPLE_VACCINATED_PERCENT)
         val locationIndex = headerTitles.indexOf(VACCINE_DATA_LOCATION_HEADER_TITLE)
 
-        val temporaryVaccinationData = mutableListOf<CovidData>()
+        val temporaryVaccinationData = mutableMapOf<Location, MutableList<CovidData>>()
 
         var csvLine = bufferedSource.readUtf8Line()
         while (csvLine != null) {
@@ -112,21 +113,37 @@ class CovidDataRepo(
             }
             val locationString = if (isCountryData) Location.UNITED_STATES.toString() else valuesArray.getOrNull(locationIndex)
             val peopleVaccinated = valuesArray.getOrNull(totalPeopleVaccinatedIndex)?.toDoubleOrNull()
-
-            val previousDaysData = temporaryVaccinationData.lastOrNull()
-
-            val newVaccinations = peopleVaccinated?.let {
-                peopleVaccinated - (previousDaysData?.totalPeopleVaccinated ?: 0)
-            } ?: 0.0
+            val percentVaccinated = if (isCountryData) {
+                if (peopleVaccinated == null) {
+                    null
+                } else {
+                    ((peopleVaccinated ?: 0.0) / US_POPULATION) * 100
+                }
+            } else {
+                valuesArray.getOrNull(percentVaccinatedIndex)?.toDoubleOrNull()
+            }
 
             val location = Location.getLocationFromString(locationString)
+
+            val previousDaysData = if (location != null) temporaryVaccinationData[location]?.lastOrNull() else null
+
+            val newVaccinations = peopleVaccinated?.let {
+                val test = peopleVaccinated - (previousDaysData?.totalPeopleVaccinated?.toDouble() ?: 0.0)
+                 test
+            } ?: 0.0
+
             if (date != null && location != null) {
-                temporaryVaccinationData.add(
+                if (temporaryVaccinationData[location] == null) {
+                    temporaryVaccinationData[location] = mutableListOf()
+                }
+
+                temporaryVaccinationData[location]?.add(
                     CovidData(
                         date = date,
                         location = location,
                         totalPeopleVaccinated = peopleVaccinated?.toLong(),
-                        newPeopleVaccinated = newVaccinations.toLong()
+                        newPeopleVaccinated = newVaccinations.toLong(),
+                        percentOfPopulationVaccinated = percentVaccinated
                     )
                 )
             }
@@ -138,11 +155,12 @@ class CovidDataRepo(
         return covidData.map { dataWithoutVaccinations ->
 
             val matchingVaccinationData =
-                temporaryVaccinationData.find { it.date == dataWithoutVaccinations.date && it.location == dataWithoutVaccinations.location }
+                temporaryVaccinationData[dataWithoutVaccinations.location]?.find { it.date == dataWithoutVaccinations.date }
             if (matchingVaccinationData != null) {
                 return@map dataWithoutVaccinations.copy(
                     totalPeopleVaccinated = matchingVaccinationData.totalPeopleVaccinated,
-                    newPeopleVaccinated = matchingVaccinationData.newPeopleVaccinated
+                    newPeopleVaccinated = matchingVaccinationData.newPeopleVaccinated,
+                    percentOfPopulationVaccinated = matchingVaccinationData.percentOfPopulationVaccinated
                 )
             }
 
@@ -285,6 +303,9 @@ class CovidDataRepo(
         const val VACCINE_DATA_DATE_HEADER_TITLE = "date"
         const val VACCINE_DATA_TOTAL_PEOPLE_VACCINATED_HEADER_TITLE = "people_vaccinated"
         const val VACCINE_DATA_LOCATION_HEADER_TITLE = "location"
+        const val VACCINE_DATA_PEOPLE_VACCINATED_PERCENT = "people_vaccinated_per_hundred"
+
+        const val US_POPULATION = 328200000.0
     }
 
 }

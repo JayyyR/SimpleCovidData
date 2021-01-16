@@ -35,5 +35,14 @@ class TestOurWorldInDataApi: OurWorldInDataApi {
         return test.toFlowable(BackpressureStrategy.LATEST)
     }
 
+    override fun vaccinationStateData(): Flowable<ResponseBody> {
+        val test = BehaviorSubject.create<ResponseBody>()
+        test.onNext(ResponseBody.create(
+            MediaType.parse("application/json"),
+            "{\"key\":[\"somestuff\"]}"
+        ))
+        return test.toFlowable(BackpressureStrategy.LATEST)
+    }
+
 
 }

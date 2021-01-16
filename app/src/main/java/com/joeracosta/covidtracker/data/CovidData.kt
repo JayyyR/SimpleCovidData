@@ -27,7 +27,9 @@ data class CovidData(
 
     val newVaccinationsSevenDayAvg: Double? = null,
 
-    val totalPeopleVaccinated: Long? = null
+    val totalPeopleVaccinated: Long? = null,
+
+    val percentOfPopulationVaccinated: Double? = null
 )
 
 

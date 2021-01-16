@@ -257,6 +257,24 @@
                     android:text="@string/total_vaccinations"
                     android:textColor="@drawable/radio_flat_text_selector_blue" />
 
+
+
+                <RadioButton
+                    android:id="@+id/percent_vaccinated"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+                    android:background="@drawable/radio_flat_selector_blue"
+                    android:button="@android:color/transparent"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:text="@string/percent_vaccinated"
+                    android:textColor="@drawable/radio_flat_text_selector_blue" />
+
             </RadioGroup>
 
 
