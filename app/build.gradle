@@ -12,8 +12,8 @@ android {
         applicationId "com.joeracosta.covidtracker"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 4
-        versionName "3"
+        versionCode 5
+        versionName "4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
