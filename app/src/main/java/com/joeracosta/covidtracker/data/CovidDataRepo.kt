@@ -111,8 +111,12 @@ class CovidDataRepo(
             val date = dateString?.let {
                 dateFormat.parse(dateString)
             }
-            val locationString = if (isCountryData) Location.UNITED_STATES.toString() else valuesArray.getOrNull(locationIndex)
-            val peopleVaccinated = valuesArray.getOrNull(totalPeopleVaccinatedIndex)?.toDoubleOrNull()
+            val locationString =
+                if (isCountryData) Location.UNITED_STATES.toString() else valuesArray.getOrNull(
+                    locationIndex
+                )
+            val peopleVaccinated =
+                valuesArray.getOrNull(totalPeopleVaccinatedIndex)?.toDoubleOrNull()
             val percentVaccinated = if (isCountryData) {
                 if (peopleVaccinated == null) {
                     null
@@ -125,12 +129,17 @@ class CovidDataRepo(
 
             val location = Location.getLocationFromString(locationString)
 
-            val previousDayWithData = if (location != null) temporaryVaccinationData[location]?.findLast { it.totalPeopleVaccinated != null } else null
+            val previousDayWithData =
+                if (location != null) temporaryVaccinationData[location]?.findLast { it.totalPeopleVaccinated != null } else null
 
             //estimate new vaccinations by dividing by days between vaccine data since there are gaps in the data
-            val daysBetweenVaccineData = if (previousDayWithData != null) daysBetween(previousDayWithData.date, date) else null
+            val daysBetweenVaccineData = if (previousDayWithData != null) daysBetween(
+                previousDayWithData.date,
+                date
+            ) else null
             val newVaccinations = peopleVaccinated?.let {
-               (peopleVaccinated - (previousDayWithData?.totalPeopleVaccinated?.toDouble() ?: 0.0)) / (daysBetweenVaccineData ?: 1)
+                (peopleVaccinated - (previousDayWithData?.totalPeopleVaccinated?.toDouble()
+                    ?: 0.0)) / (daysBetweenVaccineData ?: 1)
             }
 
             if (date != null && location != null) {
@@ -151,6 +160,45 @@ class CovidDataRepo(
 
             csvLine = bufferedSource.readUtf8Line()
         }
+
+        //add filler data for previous days. Vaccinations started on 12/14 but we don't have data until later (for the states almost a month later)
+        //so daily vaccination data at the start is wrong. We'll divide it up between the days to get a more accurate graph of new vaccinations
+        temporaryVaccinationData.keys.forEach { location ->
+            val sortedData =
+                temporaryVaccinationData[location]?.sortedBy { it.date } //sort just in case
+            val firstDayWithData = sortedData?.firstOrNull { it.newPeopleVaccinated != null }
+            val daysBetweenData =
+                daysBetween(getFirstDayOfVaccinations().time, firstDayWithData?.date)
+
+            if (daysBetweenData == -1) return@forEach
+            val daysToCalculateWith = daysBetweenData + 1
+            val dailyVaccinationsSpreadBetweenDays =
+                (firstDayWithData?.newPeopleVaccinated ?: 0) / daysToCalculateWith
+
+            //remove firstday of data because we're going to add it back with the new daily vaccinations
+            temporaryVaccinationData[location]?.removeAll { it.date == firstDayWithData?.date }
+
+            var daysBetween = daysBetweenData
+            while (daysBetween >= 0) {
+                val newDate = subtractDays(firstDayWithData?.date, daysBetween)
+                if (newDate != null) {
+                    temporaryVaccinationData[location]?.add(
+                        CovidData(
+                            date = newDate,
+                            location = location,
+                            totalPeopleVaccinated = if (newDate == firstDayWithData?.date) firstDayWithData.totalPeopleVaccinated else null,
+                            newPeopleVaccinated = dailyVaccinationsSpreadBetweenDays,
+                            percentOfPopulationVaccinated = if (newDate == firstDayWithData?.date) firstDayWithData.percentOfPopulationVaccinated else null
+                        )
+                    )
+                }
+                daysBetween--
+            }
+
+            //sort back into place
+            temporaryVaccinationData[location]?.sortBy { it.date }
+        }
+
 
         //combine data
         return covidData.map { dataWithoutVaccinations ->
@@ -202,22 +250,10 @@ class CovidDataRepo(
                     null
                 }
 
-                val dayOfFirstVaccinations = Calendar.getInstance()
-                    .apply {
-                        set(2020, 11, 14, 0, 0, 0)
-                        set(Calendar.MILLISECOND, 0)
-                    }
 
-                val daysBetweenCurrentAndFirstDay =
-                    daysBetween(dayOfFirstVaccinations.time, covidData.date)
-                val daysToCalculateVaccineAvgsWith = minOf(
-                    daysBetweenCurrentAndFirstDay,
-                    6
-                ) //calculate last 7 days or only days since vaccination startedd
-
-                val lastSevenOrLessDaysNewVaccinations =
-                    if (daysBetweenCurrentAndFirstDay >= 0 && index >= daysToCalculateVaccineAvgsWith) {
-                        list.slice(index - daysToCalculateVaccineAvgsWith..index).map {
+                val lastSevenDaysNewVaccinations =
+                    if (index >= 6) {
+                        list.slice(index - 6..index).map {
 
                             val newVaccinationsToReturn = it.newPeopleVaccinated
 
@@ -233,7 +269,7 @@ class CovidDataRepo(
 
                 //this is also necessary because some dates don't have data
                 val newVaccinationsFromActualDaysWithDataFromLastSeven =
-                    lastSevenOrLessDaysNewVaccinations?.filterNotNull()
+                    lastSevenDaysNewVaccinations?.filterNotNull()
 
                 val postiveTestRateSevenDayAvg =
                     if (positiveRateFromActualDaysWithDataFromLastSeven != null) {
@@ -293,6 +329,27 @@ class CovidDataRepo(
         val difference = ((d2.time - d1.time) / (1000 * 60 * 60 * 24)).toInt()
         return difference
     }
+
+    private fun subtractDays(date: Date?, daysToSubtract: Int): Date? {
+        if (date == null) return null
+        val cal = Calendar.getInstance()
+        cal.time = date
+        cal.add(Calendar.DATE, (daysToSubtract * -1))
+        return cal.time
+    }
+
+
+    /**
+     * Returns a day thats roughly 7 days before we have data depending on if its states or country
+     */
+    private fun getFirstDayOfVaccinations(): Calendar {
+        return Calendar.getInstance()
+            .apply {
+                set(2020, 11, 14, 0, 0, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+    }
+
 
     companion object {
         const val VACCINE_DATA_DATE_HEADER_TITLE = "date"
