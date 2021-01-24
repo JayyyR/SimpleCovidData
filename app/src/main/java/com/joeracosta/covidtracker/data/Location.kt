@@ -170,6 +170,7 @@ enum class Location(val postalCode: String) {
 
             //special case
             if (locationString.equals("New York State", ignoreCase = true)) return NEW_YORK
+            if (locationString.equals("District of Columbia", ignoreCase = true)) return DC
 
             values().forEach {
                 if (it.toString().equals(locationString, true)) {
