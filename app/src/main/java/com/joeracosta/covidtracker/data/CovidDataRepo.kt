@@ -117,7 +117,7 @@ class CovidDataRepo(
                 if (peopleVaccinated == null) {
                     null
                 } else {
-                    ((peopleVaccinated ?: 0.0) / US_POPULATION) * 100
+                    ((peopleVaccinated) / US_POPULATION) * 100
                 }
             } else {
                 valuesArray.getOrNull(percentVaccinatedIndex)?.toDoubleOrNull()
@@ -125,12 +125,13 @@ class CovidDataRepo(
 
             val location = Location.getLocationFromString(locationString)
 
-            val previousDaysData = if (location != null) temporaryVaccinationData[location]?.lastOrNull() else null
+            val previousDayWithData = if (location != null) temporaryVaccinationData[location]?.findLast { it.totalPeopleVaccinated != null } else null
 
+            //estimate new vaccinations by dividing by days between vaccine data since there are gaps in the data
+            val daysBetweenVaccineData = if (previousDayWithData != null) daysBetween(previousDayWithData.date, date) else null
             val newVaccinations = peopleVaccinated?.let {
-                val test = peopleVaccinated - (previousDaysData?.totalPeopleVaccinated?.toDouble() ?: 0.0)
-                 test
-            } ?: 0.0
+               (peopleVaccinated - (previousDayWithData?.totalPeopleVaccinated?.toDouble() ?: 0.0)) / (daysBetweenVaccineData ?: 1)
+            }
 
             if (date != null && location != null) {
                 if (temporaryVaccinationData[location] == null) {
@@ -142,7 +143,7 @@ class CovidDataRepo(
                         date = date,
                         location = location,
                         totalPeopleVaccinated = peopleVaccinated?.toLong(),
-                        newPeopleVaccinated = newVaccinations.toLong(),
+                        newPeopleVaccinated = newVaccinations?.toLong(),
                         percentOfPopulationVaccinated = percentVaccinated
                     )
                 )
@@ -218,13 +219,7 @@ class CovidDataRepo(
                     if (daysBetweenCurrentAndFirstDay >= 0 && index >= daysToCalculateVaccineAvgsWith) {
                         list.slice(index - daysToCalculateVaccineAvgsWith..index).map {
 
-                            val newVaccinationsToReturn =
-                                //if united states, return 0 if no data
-                                if (it.location == Location.UNITED_STATES) {
-                                    it.newPeopleVaccinated ?: 0
-                                } else {
-                                    it.newPeopleVaccinated
-                                }
+                            val newVaccinationsToReturn = it.newPeopleVaccinated
 
                             newVaccinationsToReturn
                         }
@@ -236,7 +231,7 @@ class CovidDataRepo(
                 val positiveRateFromActualDaysWithDataFromLastSeven =
                     lastSevenDaysPositiveRate?.filterNotNull()
 
-                //this is also necessary because only dates after late Dec have vaccination Data
+                //this is also necessary because some dates don't have data
                 val newVaccinationsFromActualDaysWithDataFromLastSeven =
                     lastSevenOrLessDaysNewVaccinations?.filterNotNull()
 
@@ -249,7 +244,7 @@ class CovidDataRepo(
 
                 val newVaccinationsSevenDayAvg =
                     if (newVaccinationsFromActualDaysWithDataFromLastSeven?.isNotEmpty() == true) {
-                        newVaccinationsFromActualDaysWithDataFromLastSeven.sumByDouble { it.toDouble() } / lastSevenOrLessDaysNewVaccinations.size //we calculate avg out of all days even if some days didn't have new vaccinations
+                        newVaccinationsFromActualDaysWithDataFromLastSeven.sumByDouble { it.toDouble() } / newVaccinationsFromActualDaysWithDataFromLastSeven.size //calculate avg with data we have (not all days have data)
                     } else {
                         null
                     }
@@ -293,8 +288,8 @@ class CovidDataRepo(
         return successObservable
     }
 
-    private fun daysBetween(d1: Date, d2: Date?): Int {
-        if (d2 == null) return -1
+    private fun daysBetween(d1: Date?, d2: Date?): Int {
+        if (d1 == null || d2 == null) return -1
         val difference = ((d2.time - d1.time) / (1000 * 60 * 60 * 24)).toInt()
         return difference
     }
