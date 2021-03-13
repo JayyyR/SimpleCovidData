@@ -91,20 +91,20 @@ class CovidActivity : AppCompatActivity() {
 
     private fun setDataPlotSelector(dataToPlot: DataToPlot?) {
         val indexToSelect = when (dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.NEW_VACCINATIONS -> 0
-            DataToPlot.CURRENT_HOSPITALIZATIONS, DataToPlot.TOTAL_VACCINATIONS -> 1
+            DataToPlot.NEW_CASES, DataToPlot.NEW_VACCINATIONS -> 0
+            DataToPlot.NEW_DEATHS, DataToPlot.TOTAL_VACCINATIONS -> 1
             DataToPlot.PERCENT_VACCINATED -> 2
             else -> -1
         }
 
         val groupToUpdate = when (dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> binding?.covidDataToPlotPicker
+            DataToPlot.NEW_CASES, DataToPlot.NEW_DEATHS -> binding?.covidDataToPlotPicker
             DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS, DataToPlot.PERCENT_VACCINATED -> binding?.vaccineDataToPlotPicker
             else -> null
         }
 
         val groupToClear = when (dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> binding?.vaccineDataToPlotPicker
+            DataToPlot.NEW_CASES, DataToPlot.NEW_DEATHS -> binding?.vaccineDataToPlotPicker
             DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS, DataToPlot.PERCENT_VACCINATED -> binding?.covidDataToPlotPicker
             else -> null
         }
@@ -199,7 +199,7 @@ class CovidActivity : AppCompatActivity() {
             dataSet.lineWidth = 3f
 
             val colorIdToUse = when (dataToPlot) {
-                DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> R.color.colorAccent
+                DataToPlot.NEW_CASES, DataToPlot.NEW_DEATHS -> R.color.colorAccent
                 DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS, DataToPlot.PERCENT_VACCINATED -> R.color.colorAccentBlue
                 else -> R.color.colorAccent
             }

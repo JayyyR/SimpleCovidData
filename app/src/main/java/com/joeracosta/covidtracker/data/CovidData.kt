@@ -17,11 +17,9 @@ data class CovidData(
 
     val date: Date? = null,
 
-    val postiveTestRate: Double? = null,
+    val newCasesSevenDayAvg: Double? = null,
 
-    val postiveTestRateSevenDayAvg: Double? = null,
-
-    val hospitalizedCurrently: Int? = null,
+    val newDeathsSevenDayAvg: Double? = null,
 
     val newPeopleVaccinated: Long? = null,
 
@@ -32,26 +30,24 @@ data class CovidData(
     val percentOfPopulationVaccinated: Double? = null
 )
 
+data class CovidRawResponse(
+    @SerializedName("us_compare_trends_data")
+    val covidData: List<CovidRawData>
+)
 
 data class CovidRawData(
 
     @SerializedName("state")
     val location: Location? = null,
 
-    @SerializedName("date")
+    @SerializedName("submission_date")
     val date: String? = null,
 
-    @SerializedName("positiveIncrease")
-    val positiveIncrease: Long? = null,
+    @SerializedName("seven_day_avg_new_deaths")
+    val newDeathsSevenDayAvg: Double? = null,
 
-    @SerializedName("negativeIncrease")
-    val negativeIncrease: Long? = null,
-
-    @SerializedName("totalTestResultsIncrease")
-    val totalTestResultsIncrease: Long? = null,
-
-    @SerializedName("hospitalizedCurrently")
-    val hospitalizedCurrently: Int? = null
+    @SerializedName("seven_day_avg_new_cases")
+    val newCasesSevenDayAvg: Double? = null
 
 ) {
     @SuppressLint("SimpleDateFormat")
@@ -59,44 +55,11 @@ data class CovidRawData(
         return CovidData(
             location = location,
             date = date?.let {
-                val dateFormat = SimpleDateFormat("yyyyMMdd")
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd")
                 dateFormat.parse(it)
             },
-            postiveTestRate =
-            positiveIncrease?.let {
-
-                //the data is funky sometimes, we need to work with what we have and throw out anomalies
-                val totalToCalculateAgainst =
-                    if (totalTestResultsIncrease != null && totalTestResultsIncrease > positiveIncrease) { //throw away data where total = positive. It happens and it's garbage data
-                        totalTestResultsIncrease
-                    } else if (negativeIncrease != null && negativeIncrease > 0) {
-                        positiveIncrease + negativeIncrease
-                    } else {
-                        null
-                    }
-
-                val postiveTestRate = when {
-                    positiveIncrease == 0L -> {
-                        positiveIncrease.toDouble()
-                    }
-                    totalToCalculateAgainst != null -> {
-                        (positiveIncrease.toDouble() / (totalToCalculateAgainst)) * 100
-                    }
-                    else -> {
-                        null
-                    }
-                }
-
-                //todo there are still anomalies like this...should I get rid of em?
-                /* Weird anomaly example with NJ in SEPT
-                if (postiveTestRate == 29.20353982300885 && state == State.NEW_JERSEY) {
-                    println()
-                }*/
-
-                postiveTestRate
-
-            },
-            hospitalizedCurrently = hospitalizedCurrently
+            newCasesSevenDayAvg = newCasesSevenDayAvg,
+            newDeathsSevenDayAvg = newDeathsSevenDayAvg
         )
     }
 }

@@ -21,7 +21,7 @@ class DatabaseHelper(val appContext: Context){
 
 @Database(
     entities = [CovidData::class],
-    version = 5
+    version = 6
 )
 @TypeConverters(value = [Converters::class])
 abstract class CovidDatabase: RoomDatabase() {

@@ -32,7 +32,7 @@ class CovidApp: Application() {
 
     val covidTrackingRetrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://covidtracking.com/api/v1/")
+            .baseUrl("https://covid.cdc.gov/covid-data-tracker/COVIDData/")
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(OkHttpClient.Builder().build())

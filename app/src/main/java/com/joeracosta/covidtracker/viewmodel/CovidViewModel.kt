@@ -33,7 +33,7 @@ class CovidViewModel(
     private val defaultState = CovidState(
         selectedUsaLocation = lastUpdatedData.getSelectedUSState() ?: Location.UNITED_STATES,
         amountOfDaysAgoToShow = lastUpdatedData.getAmountOfDaysAgoToShow() ?: ALL_TIME_DAYS,
-        dataToPlot = lastUpdatedData.getDataToPlot() ?: DataToPlot.POSITIVE_CASE_RATE
+        dataToPlot = lastUpdatedData.getDataToPlot() ?: DataToPlot.NEW_CASES
     )
 
     private val compositeDisposable = CompositeDisposable()
@@ -65,8 +65,8 @@ class CovidViewModel(
 
     val covidDataPlotIndexListener: (Int) -> Unit = { index ->
         when (index) {
-            0 -> setDataToPlot(DataToPlot.POSITIVE_CASE_RATE)
-            1 -> setDataToPlot(DataToPlot.CURRENT_HOSPITALIZATIONS)
+            0 -> setDataToPlot(DataToPlot.NEW_CASES)
+            1 -> setDataToPlot(DataToPlot.NEW_DEATHS)
         }
     }
 
@@ -110,8 +110,8 @@ class CovidViewModel(
     @Bindable
     fun getChartTitle(): String {
         return when (currentState.dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE -> stringGetter.getString(R.string.positive_rate_chart_title)
-            DataToPlot.CURRENT_HOSPITALIZATIONS -> stringGetter.getString(R.string.current_hospitalizations_chart_title)
+            DataToPlot.NEW_CASES -> stringGetter.getString(R.string.new_cases_chart_title)
+            DataToPlot.NEW_DEATHS -> stringGetter.getString(R.string.new_deaths_chart_title)
             DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.new_vaccinations_chart_title)
             DataToPlot.TOTAL_VACCINATIONS -> stringGetter.getString(R.string.total_vaccinations_chart_title)
             DataToPlot.PERCENT_VACCINATED -> stringGetter.getString(R.string.percent_vaccinated_chart_title)
@@ -140,7 +140,7 @@ class CovidViewModel(
     @Bindable
     fun getDisclaimerText(): String {
         return when (currentState.dataToPlot) {
-            DataToPlot.CURRENT_HOSPITALIZATIONS -> stringGetter.getString(R.string.hospitalizations_disclaimer)
+            DataToPlot.NEW_DEATHS -> stringGetter.getString(R.string.hospitalizations_disclaimer)
             else -> ""
         }
     }
@@ -148,7 +148,7 @@ class CovidViewModel(
     @Bindable
     fun getSubtitleText(): String {
         return when (currentState.dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
+            DataToPlot.NEW_CASES, DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
             else -> ""
         }
     }
@@ -156,7 +156,7 @@ class CovidViewModel(
     @Bindable
     fun getBackgroundForDateRadioButton(): Int {
         return when (currentState.dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> R.drawable.radio_flat_selector_red
+            DataToPlot.NEW_CASES, DataToPlot.NEW_DEATHS -> R.drawable.radio_flat_selector_red
             DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS, DataToPlot.PERCENT_VACCINATED -> R.drawable.radio_flat_selector_blue
             else -> R.drawable.radio_flat_selector_red
         }
@@ -174,8 +174,8 @@ class CovidViewModel(
             val dateFloat = it.date?.time?.toFloat()
 
             val dataToDisplay = when (dataToPlot) {
-                DataToPlot.POSITIVE_CASE_RATE -> it.postiveTestRateSevenDayAvg?.toFloat()
-                DataToPlot.CURRENT_HOSPITALIZATIONS -> it.hospitalizedCurrently?.toFloat()
+                DataToPlot.NEW_CASES -> it.newCasesSevenDayAvg?.toFloat()
+                DataToPlot.NEW_DEATHS -> it.newDeathsSevenDayAvg?.toFloat()
                 DataToPlot.NEW_VACCINATIONS -> {
                     //don't plot days we don't have data for yet
                     if (index > latestDayWithVaccinationTotalsIndex) {
@@ -212,7 +212,7 @@ class CovidViewModel(
     @Bindable
     fun getTextColorForDateRadioButton(): ColorStateList? {
         val resourceId = when (currentState.dataToPlot) {
-            DataToPlot.POSITIVE_CASE_RATE, DataToPlot.CURRENT_HOSPITALIZATIONS -> R.drawable.radio_flat_text_selector_red
+            DataToPlot.NEW_CASES, DataToPlot.NEW_DEATHS -> R.drawable.radio_flat_text_selector_red
             DataToPlot.NEW_VACCINATIONS, DataToPlot.TOTAL_VACCINATIONS, DataToPlot.PERCENT_VACCINATED -> R.drawable.radio_flat_text_selector_blue
             else -> R.drawable.radio_flat_text_selector_red
         }
@@ -249,7 +249,7 @@ class CovidViewModel(
 
         if (selectedUsaState != null && selectedAfterDate != null) {
             daoDisposable?.dispose()
-            daoDisposable = covidDataDao.getPostiveRateByStateAfterDate(
+            daoDisposable = covidDataDao.getCovidDataAfterDate(
                 selectedUsaState.postalCode,
                 selectedAfterDate
             )

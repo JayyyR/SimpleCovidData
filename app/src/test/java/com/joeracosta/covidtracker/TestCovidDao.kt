@@ -7,7 +7,7 @@ import io.reactivex.Flowable
 import java.util.*
 
 class TestCovidDao: CovidDataDao {
-    override fun getPostiveRateByStateAfterDate(
+    override fun getCovidDataAfterDate(
         state: String,
         date: Date
     ): Flowable<List<CovidData>> {

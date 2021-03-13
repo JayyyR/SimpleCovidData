@@ -32,10 +32,10 @@ class CovidDataRepo(
 
         Flowable.zip(
             covidTrackingProjectApi.getStateData(),
-            covidTrackingProjectApi.getUSData(),
+            Flowable.just(listOf<CovidRawData>()),//covidTrackingProjectApi.getUSData(),
             ourWorldInDataApi.vaccinationUSData(),
             ourWorldInDataApi.vaccinationStateData(),
-            Function4 { stateData: List<CovidRawData>,
+            Function4 { stateData: CovidRawResponse,
                         usData: List<CovidRawData>,
                         usVaccinationResponse: ResponseBody,
                         stateVaccinationResponse: ResponseBody ->
@@ -52,7 +52,7 @@ class CovidDataRepo(
 
                 val stateDataWithVaccinations = addVaccinations(
                     rawVaccineResponse = stateVaccinationResponse,
-                    covidData = stateData.map { it.toCovidData() },
+                    covidData = stateData.covidData.map { it.toCovidData() },
                     isCountryData = false
                 )
 
@@ -67,9 +67,9 @@ class CovidDataRepo(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ covidData: List<CovidData> ->
 
-                val dataWithSevenDayAverages = calculateSevenDayAverages(covidData)
+                val dataWithAvgs = calculateSevenDayAverages(covidData)
 
-                updateDatabaseData(dataWithSevenDayAverages).subscribe({ success ->
+                updateDatabaseData(dataWithAvgs).subscribe({ success ->
                     successObservable.onNext(success)
                 }, {
                     successObservable.onNext(false)
@@ -242,14 +242,6 @@ class CovidDataRepo(
             //calculate averages
             val listDataWithSevenDayAvgs = list.mapIndexed { index, covidData ->
 
-                val lastSevenDaysPositiveRate = if (index >= 6) {
-                    list.slice(index - 6..index).map {
-                        it.postiveTestRate
-                    }
-                } else {
-                    null
-                }
-
 
                 val lastSevenDaysNewVaccinations =
                     if (index >= 6) {
@@ -263,20 +255,10 @@ class CovidDataRepo(
                         null
                     }
 
-                //sometimes days have null data because of garabage from the API but we still want to calculate averages from the data we have
-                val positiveRateFromActualDaysWithDataFromLastSeven =
-                    lastSevenDaysPositiveRate?.filterNotNull()
-
                 //this is also necessary because some dates don't have data
                 val newVaccinationsFromActualDaysWithDataFromLastSeven =
                     lastSevenDaysNewVaccinations?.filterNotNull()
 
-                val postiveTestRateSevenDayAvg =
-                    if (positiveRateFromActualDaysWithDataFromLastSeven != null) {
-                        (positiveRateFromActualDaysWithDataFromLastSeven.sumByDouble { it }) / positiveRateFromActualDaysWithDataFromLastSeven.size //we only calculate avg with days that had data
-                    } else {
-                        null
-                    }
 
                 val newVaccinationsSevenDayAvg =
                     if (newVaccinationsFromActualDaysWithDataFromLastSeven?.isNotEmpty() == true) {
@@ -286,7 +268,6 @@ class CovidDataRepo(
                     }
 
                 covidData.copy(
-                    postiveTestRateSevenDayAvg = postiveTestRateSevenDayAvg,
                     newVaccinationsSevenDayAvg = newVaccinationsSevenDayAvg
                 )
 

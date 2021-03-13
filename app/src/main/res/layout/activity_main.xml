@@ -179,7 +179,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/corona_graph">
 
                 <RadioButton
-                    android:id="@+id/positive_test_rate"
+                    android:id="@+id/new_cases"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -191,11 +191,11 @@
                     android:maxLines="1"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
-                    android:text="@string/positive_test_rate"
+                    android:text="@string/new_cases"
                     android:textColor="@drawable/radio_flat_text_selector_red" />
 
                 <RadioButton
-                    android:id="@+id/current_hospitalizations"
+                    android:id="@+id/new_deaths"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -207,7 +207,7 @@
                     android:maxLines="1"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
-                    android:text="@string/current_hospitalizations"
+                    android:text="@string/new_deaths"
                     android:textColor="@drawable/radio_flat_text_selector_red" />
 
             </RadioGroup>
