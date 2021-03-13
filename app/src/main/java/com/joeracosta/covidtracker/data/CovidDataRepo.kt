@@ -32,21 +32,17 @@ class CovidDataRepo(
 
         Flowable.zip(
             covidTrackingProjectApi.getStateData(),
-            Flowable.just(listOf<CovidRawData>()),//covidTrackingProjectApi.getUSData(),
+            covidTrackingProjectApi.getUSData(),
             ourWorldInDataApi.vaccinationUSData(),
             ourWorldInDataApi.vaccinationStateData(),
             Function4 { stateData: CovidRawResponse,
-                        usData: List<CovidRawData>,
+                        usResponse: USRawResponse,
                         usVaccinationResponse: ResponseBody,
                         stateVaccinationResponse: ResponseBody ->
 
                 val usDataWithVaccinations = addVaccinations(
                     rawVaccineResponse = usVaccinationResponse,
-                    covidData = usData.map {
-                        it.copy(
-                            location = Location.UNITED_STATES
-                        ).toCovidData()
-                    },
+                    covidData = usResponse.usData.mapNotNull { it.toCovidData() },
                     isCountryData = true
                 )
 

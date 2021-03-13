@@ -35,6 +35,41 @@ data class CovidRawResponse(
     val covidData: List<CovidRawData>
 )
 
+data class USRawResponse(
+    @SerializedName("us_trend_data")
+    val usData: List<RawUSData>
+)
+
+data class RawUSData(
+
+    @SerializedName("date")
+    val date: String? = null,
+
+    @SerializedName("seven_day_avg_new_cases")
+    val newCasesSevenDayAvg: Double? = null,
+
+    @SerializedName("seven_day_avg_new_deaths")
+    val newDeathsSevenDayAvg: Double? = null,
+
+    @SerializedName("state")
+    val location: String? = null
+) {
+    @SuppressLint("SimpleDateFormat")
+    fun toCovidData(): CovidData? {
+        if (!location.equals("United States", true)) return null
+
+        return CovidData(
+            location = Location.UNITED_STATES,
+            date = date?.let {
+                val dateFormat = SimpleDateFormat("MMM dd yyyy")
+                dateFormat.parse(it)
+            },
+            newCasesSevenDayAvg = newCasesSevenDayAvg,
+            newDeathsSevenDayAvg = newDeathsSevenDayAvg
+        )
+    }
+}
+
 data class CovidRawData(
 
     @SerializedName("state")
