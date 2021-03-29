@@ -140,7 +140,6 @@ class CovidViewModel(
     @Bindable
     fun getDisclaimerText(): String {
         return when (currentState.dataToPlot) {
-            DataToPlot.NEW_DEATHS -> stringGetter.getString(R.string.hospitalizations_disclaimer)
             else -> ""
         }
     }
@@ -148,7 +147,7 @@ class CovidViewModel(
     @Bindable
     fun getSubtitleText(): String {
         return when (currentState.dataToPlot) {
-            DataToPlot.NEW_CASES, DataToPlot.NEW_VACCINATIONS -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
+            DataToPlot.NEW_CASES, DataToPlot.NEW_VACCINATIONS, DataToPlot.NEW_DEATHS -> stringGetter.getString(R.string.chart_subtitle_seven_day_avg)
             else -> ""
         }
     }

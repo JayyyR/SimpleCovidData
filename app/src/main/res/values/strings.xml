@@ -16,9 +16,7 @@
     <string name="two_weeks">2 Weeks</string>
     <string name="five_days">5 Days</string>
     <string name="two_months">2 Months</string>
-    <string name="seven_day_avg">Seven Day Average</string>
     <string name="error_fetching_data">Error Fetching Data</string>
-    <string name="hospitalizations_disclaimer">Note: Some states don\'t report hospitalizations. Data may be missing.</string>
     <string name="new_vaccinations">New Vaccinations</string>
     <string name="total_vaccinations">Total Vaccinations</string>
     <string name="percent_vaccinated">% Vaccinated</string>

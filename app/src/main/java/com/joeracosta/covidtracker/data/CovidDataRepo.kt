@@ -12,6 +12,8 @@ import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import okhttp3.ResponseBody
+import org.joda.time.DateTime
+import org.joda.time.Days
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -303,8 +305,14 @@ class CovidDataRepo(
 
     private fun daysBetween(d1: Date?, d2: Date?): Int {
         if (d1 == null || d2 == null) return -1
-        val difference = ((d2.time - d1.time) / (1000 * 60 * 60 * 24)).toInt()
+
+        val difference = Days.daysBetween(DateTime(d1.time), DateTime(d2.time)).days
+
+
+        //val difference = ((d2.time - d1.time) / (1000 * 60 * 60 * 24)).toInt()
         return difference
+
+
     }
 
     private fun subtractDays(date: Date?, daysToSubtract: Int): Date? {
