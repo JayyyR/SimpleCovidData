@@ -9,7 +9,7 @@ The app uses Room to store daily data and auto updates once every 24 hours.
 
 
 
-Data gathered from the [The COVID Tracking Project](https://github.com/COVID19Tracking)
+Data gathered from the CDC, formerly [The COVID Tracking Project](https://github.com/COVID19Tracking)
 
 
 # License
